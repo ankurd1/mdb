@@ -1,0 +1,16 @@
+moviedirbrowser
+###############
+
+A script that shows information relating to the selected movie file from IMDB.
+
+Features
+--------
+- Parses movie name from the filename
+- Searches for the name on IMDB
+- Display(?) the info
+
+Optional
+--------
+- Cache the downloaded information in a db/file
+- Display multiple files in a single unified UI
+- Download subs
