@@ -1,6 +1,10 @@
 #!/usr/bin/python
 
 import re
+import urllib2
+import simplejson
+
+api_url = 'http://www.imdbapi.com/?t='
 
 
 def get_movie_name(filename):
@@ -34,3 +38,11 @@ def get_movie_name(filename):
             re.sub('[\._\-\[\(\]\)]', ' ', filename).strip())
 
     return filename
+
+
+def get_imdb_data(moviename):
+    res = simplejson.load(urllib2.urlopen(api_url + moviename))
+    if (res['Response'] == 'True'):
+        return res
+    else:
+        return None
