@@ -14,8 +14,8 @@ def get_movie_name(filename):
     reject_words_strict = ['eng', 'scr', 'dual'] #UNUSED
 
     #prepare: remove ext, make lower
-    if (filename.rfind('.') != -1):
-        filename = filename[:filename.rfind('.')]
+    if (filename[-4] == '.'):
+        filename = filename[:-4]
 
     filename = filename.lower()
 
