@@ -11,7 +11,7 @@ def get_movie_name(filename):
     # search #NOT_IMPLEMENTED
     reject_words = ['dvd', 'xvid', 'brrip', 'r5', 'unrated', '720p',
             'x264', 'klaxxon', 'axxo']
-    reject_words_strict = ['eng', 'scr', 'dual'] #UNUSED
+    reject_words_strict = ['eng', 'scr', 'dual']  # UNUSED
 
     #prepare: remove ext, make lower
     if (filename[-4] == '.'):
