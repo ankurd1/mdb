@@ -10,8 +10,10 @@ import sys
 api_url = 'http://www.imdbapi.com/?t='
 out_file = '.mdbdata'
 movie_formats = ['avi', 'mkv']
-http_proxy = 'proxy22.iitd.ac.in:3128'
-https_proxy = 'proxy22.iitd.ac.in:3128'
+#http_proxy = 'proxy22.iitd.ac.in:3128'
+#https_proxy = 'proxy22.iitd.ac.in:3128'
+http_proxy = None
+https_proxy = None
 
 
 def zenity_error(msg):
