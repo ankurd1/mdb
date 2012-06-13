@@ -1,23 +1,67 @@
 #!/usr/bin/python
 
-import re
 import urllib2
 import simplejson
 import os
 from subprocess import call
 import sys
+import sqlite3
+import wx_signal
+import wx
+import re
+import threading
 
 api_url = 'http://www.imdbapi.com/?t='
-out_file = '.mdbdata'
-movie_formats = ['avi', 'mkv']
+out_dir = '.mdb'
+movie_formats = ['avi', 'mkv', 'mp4']
 #http_proxy = 'proxy22.iitd.ac.in:3128'
 #https_proxy = 'proxy22.iitd.ac.in:3128'
 http_proxy = None
 https_proxy = None
+img_size = '100'
 
 
 def zenity_error(msg):
     call(['zenity', '--error', '--text', msg])
+
+
+def setup(conn=None, cursor=None):
+    print "running setup"
+    os.mkdir(out_dir)
+    os.mkdir(os.path.join(out_dir, 'images'))
+    create_database(conn, cursor)
+
+
+def create_database(conn=None, cursor=None):
+    if conn is None:
+        conn = sqlite3.connect(os.path.join(out_dir, 'mdbdata.sqlite'))
+        cursor = conn.cursor()
+
+    cursor.execute('''CREATE TABLE movies (
+            filename TEXT,
+            title TEXT,
+            year INTEGER,
+            released TEXT,
+            genre TEXT,
+            rating REAL,
+            runtime TEXT,
+            director TEXT,
+            actors TEXT,
+            plot TEXT,
+            poster TEXT
+            )''')
+    cursor.execute('CREATE UNIQUE INDEX filename_index ON movies (filename)')
+    conn.commit()
+
+
+def add_to_db(filename, file_data, conn, cursor):
+    print file_data
+    cursor.execute('INSERT INTO movies VALUES(?,?,?,?,?,?,?,?,?,?,?)', (filename,
+        file_data['Title'], file_data['Year'], file_data['Released'],
+        file_data['Genre'], file_data['imdbRating'], file_data['Runtime'],
+        file_data['Director'], file_data['Actors'], file_data['Plot'],
+        file_data['Poster']))
+    conn.commit()
 
 
 def get_movie_name(filename):
@@ -29,7 +73,6 @@ def get_movie_name(filename):
     reject_words = ['dvd', 'xvid', 'brrip', 'r5', 'unrated', '720p',
             'x264', 'klaxxon', 'axxo', 'sample', 'br_300', '300mb']
     reject_words_strict = ['eng', 'scr', 'dual']  # UNUSED
-
     #prepare: remove ext, make lower
     if (filename[-4] == '.'):
         filename = filename[:-4]
@@ -62,59 +105,61 @@ def get_imdb_data(moviename):
         return None
 
 
-def display_out_file():
-    if (os.path.exists(out_file)):
-        call(['gvim', out_file])
-
-
-def format_file_data(file_data, filename):
-    for i in file_data:
-        file_data[i] = file_data[i].encode('ascii', 'ignore')
-
-    res = 'File: {0}\nTitle: {1}\nYear: {2}\nGenre: {3}\nRating: {4}\n\
-Runtime: {5}\nDirector: {6}\nActors: {7}\n\
-Plot: {8}\n'.format(filename, file_data['Title'], file_data['Year'],
-        file_data['Genre'], file_data['imdbRating'], file_data['Runtime'],
-        file_data['Director'], file_data['Actors'], file_data['Plot'])
-
-    return res
-
-
-def process_file(filename, out):
+def process_file(dbthread, filename, conn, cursor):
     file_data = get_imdb_data(get_movie_name(filename))
+    for item in file_data:
+        if file_data[item] == 'N/A':
+            file_data[item] = None
+
     if (file_data is not None):
-        out.write(format_file_data(file_data, filename))
-        out.write('=' * 80 + '\n')
+        # Add to db, save img, send signal
+        add_to_db(filename, file_data, conn, cursor)
+        if file_data['Poster'] is not None:
+            # save image
+            img_url = file_data['Poster'][:-7] + img_size + '.jpg'
+            img_file = os.path.join(out_dir, 'images', filename + '.jpg')
+            img_fh = open(img_file, 'wb')
+            img_fh.write(urllib2.urlopen(img_url).read())
+            img_fh.close()
+        dbthread.signal_gui(filename)
 
 
-def main():
+def process_files(dbthread, files, directory):
     # set proxies
     if (http_proxy is not None):
         os.environ['http_proxy'] = http_proxy
     if (https_proxy is not None):
         os.environ['https_proxy'] = https_proxy
 
-    target_dir = os.getcwd()
+    os.chdir(directory)
 
-    if (os.path.exists(out_file)):
-        display_out_file()
-    else:
-        try:
-            with open(out_file, 'w') as out:
-                for filename in os.listdir(target_dir):
-                    if (os.path.isdir(filename)):
-                        for filename2 in os.listdir(filename):
-                            if (filename2[-3:] in movie_formats):
-                                process_file(filename2, out)
+    if (not os.path.exists(out_dir)):
+        setup()
 
-                    if (filename[-3:] in movie_formats):
-                        process_file(filename, out)
-        except Exception, e:
-            zenity_error(str(e))
-            raise
+    conn = sqlite3.connect(os.path.join(out_dir, 'mdbdata.sqlite'))
+    cursor = conn.cursor()
 
-        display_out_file()
+    try:
+        for filename in files:
+            process_file(dbthread, filename, conn, cursor)
+    except Exception, e:
+        zenity_error(str(e))
+        raise
 
 
-if __name__ == '__main__':
-    main()
+class DBbuilderThread(threading.Thread):
+    def __init__(self, parent, files, directory):
+        threading.Thread.__init__(self)
+        self.parent = parent
+        self.files = files
+        self.directory = directory
+
+    def run(self):
+        """Overrides Thread.run. Don't call this directly its called internally
+        when you call Thread.start().
+        """
+        process_files(self, self.files, self.directory)
+
+    def signal_gui(self, filename):
+        evt = wx_signal.FileDoneEvent(wx_signal.myEVT_FILE_DONE, -1, filename)
+        wx.PostEvent(self.parent, evt)
