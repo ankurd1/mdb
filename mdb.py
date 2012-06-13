@@ -74,7 +74,7 @@ def format_file_data(file_data, filename):
     res = 'File: {0}\nTitle: {1}\nYear: {2}\nGenre: {3}\nRating: {4}\n\
 Runtime: {5}\nDirector: {6}\nActors: {7}\n\
 Plot: {8}\n'.format(filename, file_data['Title'], file_data['Year'],
-        file_data['Genre'], file_data['Rating'], file_data['Runtime'],
+        file_data['Genre'], file_data['imdbRating'], file_data['Runtime'],
         file_data['Director'], file_data['Actors'], file_data['Plot'])
 
     return res
