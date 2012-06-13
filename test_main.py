@@ -4,6 +4,7 @@ import DBbuilder
 import wx
 import os
 import shutil
+import wx_signal
 
 movies1 = [('Die Welle[2008]DvDrip[Ger]-FXG.avi', 'die welle', True),
         ('J.Edgar[2011]BRRip XviD-ETRG.avi', 'j edgar', True),
@@ -57,3 +58,30 @@ def test_dbbuilder_images():
             assert(os.path.exists(os.path.join('.mdb', 'images', item[0] + '.jpg')))
         else:
             assert(True)
+
+
+class CountingFrame(wx.Frame):
+    def __init__(self, parent, total):
+        wx.Frame.__init__(self, parent, title="Test", size=(300, 300))
+        self.Bind(wx_signal.EVT_FILE_DONE, self.on_file_done)
+        self.total = total
+
+    def on_file_done(self, evt):
+        print "event recieved containing" + evt.filename
+        self.total -= 1
+        assert True
+        if self.total == 0:
+            self.Destroy()
+
+
+def test_DBbuilder_signal():
+    if os.path.exists('.mdb'):
+        shutil.rmtree('.mdb')
+
+    app = wx.App(False)
+    frame = CountingFrame(None, total=len(movies1))
+
+    dbthread = DBbuilder.DBbuilderThread(frame, [item[0] for item in movies1], '.')
+    dbthread.start()
+
+    app.MainLoop()

@@ -55,7 +55,6 @@ def create_database(conn=None, cursor=None):
 
 
 def add_to_db(filename, file_data, conn, cursor):
-    print file_data
     cursor.execute('INSERT INTO movies VALUES(?,?,?,?,?,?,?,?,?,?,?)', (filename,
         file_data['Title'], file_data['Year'], file_data['Released'],
         file_data['Genre'], file_data['imdbRating'], file_data['Runtime'],
