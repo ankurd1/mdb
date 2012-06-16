@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import sys
-
 import wx
 import wx.lib.agw.ultimatelistctrl as ULC
 from wx.lib.mixins.listctrl import ColumnSorterMixin

@@ -13,6 +13,8 @@ import threading
 
 api_url = 'http://www.imdbapi.com/?t='
 out_dir = '.mdb'
+db_name = 'mdbdata.sqlite'
+images_folder = 'images'
 movie_formats = ['avi', 'mkv', 'mp4']
 #http_proxy = 'proxy22.iitd.ac.in:3128'
 #https_proxy = 'proxy22.iitd.ac.in:3128'
@@ -28,13 +30,13 @@ def zenity_error(msg):
 def setup(conn=None, cursor=None):
     print "running setup"
     os.mkdir(out_dir)
-    os.mkdir(os.path.join(out_dir, 'images'))
+    os.mkdir(os.path.join(out_dir, images_folder))
     create_database(conn, cursor)
 
 
 def create_database(conn=None, cursor=None):
     if conn is None:
-        conn = sqlite3.connect(os.path.join(out_dir, 'mdbdata.sqlite'))
+        conn = sqlite3.connect(os.path.join(out_dir, db_name))
         cursor = conn.cursor()
 
     cursor.execute('''CREATE TABLE movies (
@@ -116,7 +118,7 @@ def process_file(dbthread, filename, conn, cursor):
         if file_data['Poster'] is not None:
             # save image
             img_url = file_data['Poster'][:-7] + img_size + '.jpg'
-            img_file = os.path.join(out_dir, 'images', filename + '.jpg')
+            img_file = os.path.join(out_dir, images_folder, filename + '.jpg')
             img_fh = open(img_file, 'wb')
             img_fh.write(urllib2.urlopen(img_url).read())
             img_fh.close()
@@ -135,7 +137,7 @@ def process_files(dbthread, files, directory):
     if (not os.path.exists(out_dir)):
         setup()
 
-    conn = sqlite3.connect(os.path.join(out_dir, 'mdbdata.sqlite'))
+    conn = sqlite3.connect(os.path.join(out_dir, db_name))
     cursor = conn.cursor()
 
     try:
