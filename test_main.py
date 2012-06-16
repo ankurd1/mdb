@@ -5,6 +5,7 @@ import wx
 import os
 import shutil
 import wx_signal
+from gui import MyFrame
 
 movies1 = [('Die Welle[2008]DvDrip[Ger]-FXG.avi', 'die welle', True),
         ('J.Edgar[2011]BRRip XviD-ETRG.avi', 'j edgar', True),
@@ -25,6 +26,7 @@ movies1 = [('Die Welle[2008]DvDrip[Ger]-FXG.avi', 'die welle', True),
 movies2 = [('social network', ('The Social Network', '2010')),
         ('die welle', ('The Wave', '2008'))]
 
+movie_filenames = ['Die Welle[2008]DvDrip[Ger]-FXG.avi', 'J.Edgar[2011]BRRip XviD-ETRG.avi']
 
 def test_name_parser():
     for filename, moviename, _ in movies1:
@@ -84,4 +86,18 @@ def test_DBbuilder_signal():
     dbthread = DBbuilder.DBbuilderThread(frame, [item[0] for item in movies1], '.')
     dbthread.start()
 
+    app.MainLoop()
+
+def test_gui_row_addition():
+
+    app = wx.App()
+    frame = MyFrame(None)
+    app.SetTopWindow(frame)
+    frame.Maximize()
+
+    for f in movies1:
+        frame.add_row(f[0])
+
+    frame.Show()
+    print frame.label_1.GetLabel()
     app.MainLoop()
