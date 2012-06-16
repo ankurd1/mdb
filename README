@@ -25,8 +25,15 @@ Working
 
 Future
 --------
-- Windows support no
+- Windows support
 - Use opensubs database in addition to file name
 - Option to download subs
 - Release on github pages
 - Cache the GUI output
+- Sort by rating, year, title
+- Search for actor, diroector, genre
+- Replace GUI by js/css/html app
+- Convert this into a web app
+	- Crowdsource identification of movie
+	- Recommendation engine
+	- Promotion of piracy?
