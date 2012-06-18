@@ -79,9 +79,13 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
     def build_info_panel(self, data):
         panel_3 = wx.Panel(self.lst, -1)
-        bitmap_1 = wx.StaticBitmap(panel_3, -1, wx.Bitmap(os.path.join(
-            out_dir, images_folder, data['filename'] + '.jpg'),
-            wx.BITMAP_TYPE_ANY))
+        img_file = os.path.join(out_dir, images_folder, data['filename'] + '.jpg')
+        if os.path.exists(img_file):
+            bmp = wx.Bitmap(img_file)
+            bitmap_1 = wx.StaticBitmap(panel_3, -1, bmp)
+        else:
+            bitmap_1 = (100,100)
+
         label_1 = wx.StaticText(panel_3, -1, self.generate_label_text(data))
         font = wx.Font(11, wx.MODERN, wx.NORMAL, wx.NORMAL)
         label_1.SetFont(font)
@@ -90,9 +94,9 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
         sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_3 = wx.BoxSizer(wx.VERTICAL)
-        sizer_2.Add(bitmap_1, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
+        sizer_2.Add(bitmap_1, 1, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
         sizer_3.Add(label_1, 0, 0, 0)
-        sizer_2.Add(sizer_3, 1, wx.ALIGN_CENTER_VERTICAL, 0)
+        sizer_2.Add(sizer_3, 4, wx.ALIGN_CENTER_VERTICAL, 0)
         panel_3.SetSizer(sizer_2)
 
         return panel_3
@@ -120,6 +124,6 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
                 out = (' '*(heading_width+len(sep))) + line + '\n'
                 res += out
 
-        print ''
-        print res
+        #print ''
+        #print res
         return res

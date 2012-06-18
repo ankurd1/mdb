@@ -30,7 +30,7 @@ Future
 - Option to download subs
 - Release on github pages
 - Cache the GUI output
-- Sort by rating, year, title
+[done]- Sort by rating, year, title
 - Search for actor, diroector, genre
 - Replace GUI by js/css/html app
 - Convert this into a web app
