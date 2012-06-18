@@ -8,6 +8,8 @@ import sqlite3
 from DBbuilder import out_dir, db_name, images_folder
 import os
 from textwrap import wrap
+import threading
+import wx_signal
 
 
 class MyFrame(wx.Frame, ColumnSorterMixin):
@@ -20,6 +22,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
     def __init__(self, parent):
 
         wx.Frame.__init__(self, parent, -1, "MDB")
+        self.Bind(wx_signal.EVT_FILE_DONE, self.on_file_done)
         self.connect_to_db()
 
         # Build the list
@@ -127,3 +130,29 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         #print ''
         #print res
         return res
+
+    def on_file_done(self, evt):
+        print "event recieved containing" + evt.filename
+        self.add_row(evt.filename)
+
+
+class GuiThread(threading.Thread):
+    def __init__(self, files):
+        threading.Thread.__init__(self)
+        self.files = files
+        self.frame = None
+
+    def run(self):
+        """Overrides Thread.run. Don't call this directly its called internally
+        when you call Thread.start().
+        """
+        app = wx.App()
+        self.frame = MyFrame(None)
+        app.SetTopWindow(self.frame)
+        self.frame.Maximize()
+
+        for f in self.files:
+            self.frame.add_row(f)
+
+        self.frame.Show()
+        app.MainLoop()

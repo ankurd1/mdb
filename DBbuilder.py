@@ -108,6 +108,10 @@ def get_imdb_data(moviename):
 
 def process_file(dbthread, filename, conn, cursor):
     file_data = get_imdb_data(get_movie_name(filename))
+    if (file_data is None):
+        print "None data from imdb for", filename
+        return
+
     for item in file_data:
         if file_data[item] == 'N/A':
             file_data[item] = None
@@ -123,6 +127,7 @@ def process_file(dbthread, filename, conn, cursor):
             img_fh.write(urllib2.urlopen(img_url).read())
             img_fh.close()
         dbthread.signal_gui(filename)
+        print 'file processed'
 
 
 def process_files(dbthread, files, directory):
@@ -132,10 +137,10 @@ def process_files(dbthread, files, directory):
     if (https_proxy is not None):
         os.environ['https_proxy'] = https_proxy
 
-    os.chdir(directory)
+    #os.chdir(directory)
 
-    if (not os.path.exists(out_dir)):
-        setup()
+    #if (not os.path.exists(out_dir)):
+        #setup()
 
     conn = sqlite3.connect(os.path.join(out_dir, db_name))
     cursor = conn.cursor()
@@ -159,7 +164,9 @@ class DBbuilderThread(threading.Thread):
         """Overrides Thread.run. Don't call this directly its called internally
         when you call Thread.start().
         """
+        print 'dbbuilder running'
         process_files(self, self.files, self.directory)
+        print 'dbbuilder exiting'
 
     def signal_gui(self, filename):
         evt = wx_signal.FileDoneEvent(wx_signal.myEVT_FILE_DONE, -1, filename)
