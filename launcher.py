@@ -104,6 +104,7 @@ if __name__ == '__main__':
     for f in files_with_data:
         frame.add_row(f)
 
+    db_thread = None
     if len(files_wo_data) > 0:
         db_thread = DBbuilderThread(frame, files_wo_data, '.')
         db_thread.start()
@@ -111,4 +112,5 @@ if __name__ == '__main__':
     frame.Show()
     app.MainLoop()
 
-    db_thread.join()
+    if db_thread is not None:
+        db_thread.join()
