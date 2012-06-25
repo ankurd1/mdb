@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import urllib2
-import simplejson
 import os
 from subprocess import call
 import sys
@@ -10,6 +9,11 @@ import wx_signal
 import wx
 import re
 import threading
+
+try:
+    import simplejson as json
+except ImportError, e:
+    import json as json
 
 api_url = 'http://www.imdbapi.com/?t='
 out_dir = '.mdb'
@@ -24,7 +28,12 @@ img_size = '100'
 
 
 def zenity_error(msg):
-    call(['zenity', '--error', '--text', msg])
+    try:
+        call(['zenity', '--error', '--text', msg])
+    except OSError, e:
+        # zenity not available
+        # print to stderr
+        sys.stderr.write(msg + '\n')
 
 
 def setup(conn=None, cursor=None):
@@ -98,7 +107,7 @@ def get_movie_name(filename):
 
 
 def get_imdb_data(moviename):
-    res = simplejson.load(urllib2.urlopen(api_url +
+    res = json.load(urllib2.urlopen(api_url +
         urllib2.quote(moviename)))
     if (res['Response'] == 'True'):
         return res

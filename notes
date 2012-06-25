@@ -1,34 +1,18 @@
 moviedirbrowser (mdb)
 ###############
 
-A program that shows information relating to the selected movie file/folder
-from IMDB.
-
-DBbuilder
----------
-- For file names passed
-	- Parses movie name from filename
-	- Searches on imdb, copies image to .mdb folder, info to db
-	- Signals GUI
-
-GUI
----
-- wxpython
-- shows 1 movie or more
-
-Working
--------
-- GUI is passed 1 or more filenames
-	- if filename found in db its drawn
-	- else all the not-found ones are collected and dbbuilder is launched on them
-		- GUI is updated as each movie becomes available
-
-Future
---------
+Todo
+----
 - Windows support
+- Release on github pages
+
+Bugs
+----
+
+Optional
+--------
 - Use opensubs database in addition to file name
 - Option to download subs
-- Release on github pages
 - Cache the GUI output
 [done]- Sort by rating, year, title
 - Search for actor, diroector, genre

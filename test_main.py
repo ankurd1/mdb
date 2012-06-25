@@ -6,6 +6,7 @@ import os
 import shutil
 import wx_signal
 from gui import MyFrame
+from launcher import setup as db_dir_setup
 
 movies1 = [('Die Welle[2008]DvDrip[Ger]-FXG.avi', 'die welle', True),
         ('J.Edgar[2011]BRRip XviD-ETRG.avi', 'j edgar', True),
@@ -51,6 +52,8 @@ def test_dbbuilder_images():
     if os.path.exists('.mdb'):
         shutil.rmtree('.mdb')
 
+    db_dir_setup()
+
     dbthread = DBbuilder.DBbuilderThread(None, [item[0] for item in movies1], '.')
     dbthread.start()
     dbthread.join()
@@ -79,6 +82,8 @@ class CountingFrame(wx.Frame):
 def test_DBbuilder_signal():
     if os.path.exists('.mdb'):
         shutil.rmtree('.mdb')
+
+    db_dir_setup()
 
     app = wx.App(False)
     frame = CountingFrame(None, total=len(movies1))
