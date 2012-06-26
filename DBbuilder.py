@@ -142,7 +142,7 @@ class DBbuilderThread(threading.Thread):
         when you call Thread.start().
         """
         print 'dbbuilder running'
-        self.process_files(self.files, self.directory)
+        self.process_files()
         print 'dbbuilder exiting'
 
     def signal_gui(self, filename):
@@ -165,7 +165,7 @@ class DBbuilderThread(threading.Thread):
             if file_data['Poster'] is not None:
                 # save image
                 img_url = file_data['Poster'][:-7] + img_size + '.jpg'
-                img_file = os.path.join(out_dir, images_folder,
+                img_file = os.path.join(self.directory, out_dir, images_folder,
                                         filename + '.jpg')
                 img_fh = open(img_file, 'wb')
                 img_fh.write(urllib2.urlopen(img_url).read())
@@ -173,18 +173,18 @@ class DBbuilderThread(threading.Thread):
             self.signal_gui(filename)
             print 'file processed'
 
-    def process_files(self, files, directory):
+    def process_files(self):
         # set proxies
         if (http_proxy is not None):
             os.environ['http_proxy'] = http_proxy
         if (https_proxy is not None):
             os.environ['https_proxy'] = https_proxy
 
-        conn = sqlite3.connect(os.path.join(out_dir, db_name))
+        conn = sqlite3.connect(os.path.join(self.directory, out_dir, db_name))
         cursor = conn.cursor()
 
         try:
-            for filename in files:
+            for filename in self.files:
                 self.process_file(filename, conn, cursor)
         except Exception, e:
             zenity_error(str(e))

@@ -79,7 +79,37 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         self.SetMenuBar(menuBar)
 
     def open_folder(self, evt):
-        print 'open folder not implemented yet'
+        dlg = wx.DirDialog(self, "Choose a directory:",
+                          style=wx.DD_DEFAULT_STYLE
+                           | wx.DD_DIR_MUST_EXIST
+                           #| wx.DD_CHANGE_DIR
+                           )
+
+        if dlg.ShowModal() == wx.ID_OK:
+            target_dir = dlg.GetPath()
+        else:
+            return
+
+        dlg.Destroy()
+
+        # switch to this dir
+        self.lst.DeleteAllItems()
+        os.chdir(target_dir)
+
+        self.connect_to_db()
+
+        files_with_data, files_wo_data = process_dir('.', self.conn, self.cursor)
+
+        if ((len(files_with_data) + len(files_wo_data) > 0) and
+                (not os.path.exists(out_dir))):
+            setup(None, None)
+            self.connect_to_db()
+
+        for f in files_with_data:
+            self.add_row(f)
+
+        if len(files_wo_data) > 0:
+            start_dbbuilder(self, files_wo_data, os.path.abspath('.'))
 
     def on_about(self, evt):
         print 'on_about not implemented yet'
@@ -168,7 +198,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         return res
 
     def on_file_done(self, evt):
-        print "event recieved containing" + evt.filename
+        print "event recieved containing", evt.filename
         self.add_row(evt.filename)
 
 
@@ -214,7 +244,7 @@ def start_dbbuilder(frame, files_wo_data, parent_dir):
     db_thread.start()
 
 
-def process_dir(directory):
+def process_dir(directory, conn, cur):
     files_with_data = []
     files_wo_data = []
 
@@ -253,7 +283,7 @@ if __name__ == '__main__':
         else:
             conn = None
             cur = None
-        files_with_data, files_wo_data = process_dir('.')
+        files_with_data, files_wo_data = process_dir('.', conn, cur)
     else:
         files_with_data = []
         files_wo_data = []
@@ -286,7 +316,7 @@ if __name__ == '__main__':
     print 'files_wo_data', files_wo_data
 
     # setup
-    if ((len(files_with_data) + len(files_wo_data) > 0) and 
+    if ((len(files_with_data) + len(files_wo_data) > 0) and
             (not os.path.exists(out_dir))):
         setup(None, None)
 
@@ -300,7 +330,7 @@ if __name__ == '__main__':
         frame.add_row(f)
 
     if len(files_wo_data) > 0:
-        start_dbbuilder(frame, files_wo_data, '.')
+        start_dbbuilder(frame, files_wo_data, os.path.abspath('.'))
 
     frame.Show()
     app.MainLoop()

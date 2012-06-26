@@ -5,6 +5,7 @@ Todo
 ----
 [done]- Windows support
 - Release on github pages
+- Add a test case to test gui.py launch capabilities
 - Give out for betas
 	- GUI layout on different res
 	- Launching on win/linux
@@ -19,6 +20,8 @@ Todo
 
 Bugs
 ----
+- What if arg is a single dir which is not root, i.e. its parent has out_dir.
+- Concurrency issues, working on 1 dir then user switches to another
 
 Optional
 --------
