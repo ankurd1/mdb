@@ -13,8 +13,10 @@ import threading
 try:
     import simplejson as json
 except ImportError, e:
-    import json as json
+    import json
 
+
+#CONSTANTS#
 api_url = 'http://www.imdbapi.com/?t='
 out_dir = '.mdb'
 db_name = 'mdbdata.sqlite'
@@ -27,6 +29,7 @@ https_proxy = None
 img_size = '100'
 
 
+#HELPER FUNCTIONS#
 def zenity_error(msg):
     try:
         call(['zenity', '--error', '--text', msg])
@@ -66,11 +69,11 @@ def create_database(conn=None, cursor=None):
 
 
 def add_to_db(filename, file_data, conn, cursor):
-    cursor.execute('INSERT INTO movies VALUES(?,?,?,?,?,?,?,?,?,?,?)', (filename,
-        file_data['Title'], file_data['Year'], file_data['Released'],
-        file_data['Genre'], file_data['imdbRating'], file_data['Runtime'],
-        file_data['Director'], file_data['Actors'], file_data['Plot'],
-        file_data['Poster']))
+    cursor.execute('INSERT INTO movies VALUES(?,?,?,?,?,?,?,?,?,?,?)', (
+        filename, file_data['Title'], file_data['Year'],
+        file_data['Released'], file_data['Genre'], file_data['imdbRating'],
+        file_data['Runtime'], file_data['Director'], file_data['Actors'],
+        file_data['Plot'], file_data['Poster']))
     conn.commit()
 
 
@@ -80,8 +83,8 @@ def get_movie_name(filename):
     # after it, clean up
     # 3. Split by some token, try to remove the last words and do a
     # search #NOT_IMPLEMENTED
-    reject_words = ['dvd', 'xvid', 'brrip', 'r5', 'unrated', '720p',
-            'x264', 'klaxxon', 'axxo', 'sample', 'br_300', '300mb']
+    reject_words = ['dvd', 'xvid', 'brrip', 'r5', 'unrated', '720p', 'x264',
+                    'klaxxon', 'axxo', 'sample', 'br_300', '300mb']
     reject_words_strict = ['eng', 'scr', 'dual']  # UNUSED
     #prepare: remove ext, make lower
     if (filename[-4] == '.'):
@@ -100,68 +103,33 @@ def get_movie_name(filename):
             filename = filename[:filename.find(word)]
 
     #cleanup
-    filename = re.sub('\s+', ' ',
-            re.sub('[\._\-\[\(\]\)]', ' ', filename).strip())
+    filename = re.sub('\s+', ' ', re.sub(
+        '[\._\-\[\(\]\)]', ' ', filename).strip())
 
     return filename
 
 
 def get_imdb_data(moviename):
-    res = json.load(urllib2.urlopen(api_url +
-        urllib2.quote(moviename)))
+    res = json.load(urllib2.urlopen(api_url + urllib2.quote(moviename)))
     if (res['Response'] == 'True'):
         return res
     else:
         return None
 
 
-def process_file(dbthread, filename, conn, cursor):
-    file_data = get_imdb_data(get_movie_name(filename))
-    if (file_data is None):
-        print "None data from imdb for", filename
-        return
-
-    for item in file_data:
-        if file_data[item] == 'N/A':
-            file_data[item] = None
-
-    if (file_data is not None):
-        # Add to db, save img, send signal
-        add_to_db(filename, file_data, conn, cursor)
-        if file_data['Poster'] is not None:
-            # save image
-            img_url = file_data['Poster'][:-7] + img_size + '.jpg'
-            img_file = os.path.join(out_dir, images_folder, filename + '.jpg')
-            img_fh = open(img_file, 'wb')
-            img_fh.write(urllib2.urlopen(img_url).read())
-            img_fh.close()
-        dbthread.signal_gui(filename)
-        print 'file processed'
+def is_in_db(conn, cur, filename):
+    if conn is None:
+        return False
+    else:
+        res = cur.execute('SELECT * FROM movies WHERE filename=?',
+                          (filename,)).fetchall()
+        if len(res) > 0:
+            return True
+        else:
+            return False
 
 
-def process_files(dbthread, files, directory):
-    # set proxies
-    if (http_proxy is not None):
-        os.environ['http_proxy'] = http_proxy
-    if (https_proxy is not None):
-        os.environ['https_proxy'] = https_proxy
-
-    #os.chdir(directory)
-
-    #if (not os.path.exists(out_dir)):
-        #setup()
-
-    conn = sqlite3.connect(os.path.join(out_dir, db_name))
-    cursor = conn.cursor()
-
-    try:
-        for filename in files:
-            process_file(dbthread, filename, conn, cursor)
-    except Exception, e:
-        zenity_error(str(e))
-        raise
-
-
+#CLASSES#
 class DBbuilderThread(threading.Thread):
     def __init__(self, parent, files, directory):
         threading.Thread.__init__(self)
@@ -174,9 +142,50 @@ class DBbuilderThread(threading.Thread):
         when you call Thread.start().
         """
         print 'dbbuilder running'
-        process_files(self, self.files, self.directory)
+        self.process_files(self.files, self.directory)
         print 'dbbuilder exiting'
 
     def signal_gui(self, filename):
         evt = wx_signal.FileDoneEvent(wx_signal.myEVT_FILE_DONE, -1, filename)
         wx.PostEvent(self.parent, evt)
+
+    def process_file(self, filename, conn, cursor):
+        file_data = get_imdb_data(get_movie_name(filename))
+        if (file_data is None):
+            print "None data from imdb for", filename
+            return
+
+        for item in file_data:
+            if file_data[item] == 'N/A':
+                file_data[item] = None
+
+        if (file_data is not None):
+            # Add to db, save img, send signal
+            add_to_db(filename, file_data, conn, cursor)
+            if file_data['Poster'] is not None:
+                # save image
+                img_url = file_data['Poster'][:-7] + img_size + '.jpg'
+                img_file = os.path.join(out_dir, images_folder,
+                                        filename + '.jpg')
+                img_fh = open(img_file, 'wb')
+                img_fh.write(urllib2.urlopen(img_url).read())
+                img_fh.close()
+            self.signal_gui(filename)
+            print 'file processed'
+
+    def process_files(self, files, directory):
+        # set proxies
+        if (http_proxy is not None):
+            os.environ['http_proxy'] = http_proxy
+        if (https_proxy is not None):
+            os.environ['https_proxy'] = https_proxy
+
+        conn = sqlite3.connect(os.path.join(out_dir, db_name))
+        cursor = conn.cursor()
+
+        try:
+            for filename in files:
+                self.process_file(filename, conn, cursor)
+        except Exception, e:
+            zenity_error(str(e))
+            raise

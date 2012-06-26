@@ -12,15 +12,14 @@ import threading
 import wx_signal
 
 
+#CLASSES#
 class MyFrame(wx.Frame, ColumnSorterMixin):
-
     def connect_to_db(self):
         self.conn = sqlite3.connect(os.path.join(out_dir, db_name))
         self.conn.row_factory = sqlite3.Row
         self.cursor = self.conn.cursor()
 
     def __init__(self, parent):
-
         wx.Frame.__init__(self, parent, -1, "MDB")
         self.Bind(wx_signal.EVT_FILE_DONE, self.on_file_done)
         self.connect_to_db()
@@ -29,9 +28,10 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         # Build the list
         self.itemDataMap = {}
 
-        self.lst = ULC.UltimateListCtrl(self, wx.ID_ANY,
-                agwStyle=wx.LC_REPORT | wx.LC_VRULES | wx.LC_HRULES |
-                wx.LC_SINGLE_SEL | ULC.ULC_HAS_VARIABLE_ROW_HEIGHT)
+        self.lst = ULC.UltimateListCtrl(
+            self, wx.ID_ANY, agwStyle=wx.LC_REPORT | wx.LC_VRULES |
+            wx.LC_HRULES | wx.LC_SINGLE_SEL | ULC.ULC_HAS_VARIABLE_ROW_HEIGHT)
+
         self.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick, self.lst)
         ColumnSorterMixin.__init__(self, 6)
 
@@ -53,14 +53,16 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         menuBar = wx.MenuBar()
         menu = wx.Menu()
 
-        m_open = menu.Append(wx.ID_ANY, "&Open Folder\tCtrl-O", "Open a folder.")
+        m_open = menu.Append(wx.ID_ANY, "&Open Folder\tCtrl-O",
+                             "Open a folder.")
         self.Bind(wx.EVT_MENU, self.open_folder, m_open)
 
         menuBar.Append(menu, "&File")
 
         menu = wx.Menu()
 
-        m_about = menu.Append(wx.ID_ANY, "&About", "Information about this program")
+        m_about = menu.Append(wx.ID_ANY, "&About",
+                              "Information about this program")
         self.Bind(wx.EVT_MENU, self.on_about, m_about)
 
         menuBar.Append(menu, "&Help")
@@ -89,16 +91,14 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
         self.lst.SetItemData(index, index)
         self.itemDataMap[index] = (data['title'], data['rating'], data['year'],
-                data['genre'], data['runtime'])
+            data['genre'], data['runtime'], data['title'])
 
         self.lst.SetStringItem(index, 1, unicode(data["rating"]))
         self.lst.SetStringItem(index, 2, unicode(data["year"]))
         self.lst.SetStringItem(index, 3, unicode(data["genre"]))
         self.lst.SetStringItem(index, 4, unicode(data["runtime"]))
-        self.lst.SetItemWindow(index, 5, self.build_info_panel(data), expand=True)
-
-    def ascii_str(self, item):
-        return unicode(item)#.encode('ascii', 'ignore')
+        self.lst.SetItemWindow(index, 5, self.build_info_panel(data),
+                expand=True)
 
     def get_from_db(self, filename):
         res = self.cursor.execute('SELECT * FROM movies WHERE filename=?',
@@ -107,12 +107,13 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
     def build_info_panel(self, data):
         panel_3 = wx.Panel(self.lst, -1)
-        img_file = os.path.join(out_dir, images_folder, data['filename'] + '.jpg')
+        img_file = os.path.join(out_dir, images_folder,
+                data['filename'] + '.jpg')
         if os.path.exists(img_file):
             bmp = wx.Bitmap(img_file)
             bitmap_1 = wx.StaticBitmap(panel_3, -1, bmp)
         else:
-            bitmap_1 = (100,100)
+            bitmap_1 = (100, 100)
 
         label_1 = wx.StaticText(panel_3, -1, self.generate_label_text(data))
         font = wx.Font(11, wx.MODERN, wx.NORMAL, wx.NORMAL)
@@ -143,13 +144,14 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
         res = ""
         for item in data2:
-            item_1_lines = wrap(item[1], total_width-heading_width-len(sep))
+            item_1_lines = wrap(item[1],
+                    total_width - heading_width - len(sep))
             line1 = u"{0:<{w1}}{2}{1:<{w2}}\n".format(item[0], item_1_lines[0],
-                    sep, w1=heading_width, w2=total_width-heading_width-3)
+                    sep, w1=heading_width, w2=total_width - heading_width - 3)
             res += line1
 
             for line in item_1_lines[1:]:
-                out = (' '*(heading_width+len(sep))) + line + '\n'
+                out = (' ' * (heading_width + len(sep))) + line + '\n'
                 res += out
 
         #print ''

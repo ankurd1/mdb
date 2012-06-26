@@ -3,41 +3,22 @@
 import os
 import sys
 import sqlite3
-from DBbuilder import out_dir, db_name, images_folder, DBbuilderThread
-from gui import GuiThread
+from DBbuilder import out_dir, db_name, images_folder, DBbuilderThread,\
+    create_database, is_in_db
 import wx
 import gui
 
+
+#CONSTANTS#
 movie_formats = ['avi', 'mkv', 'mp4']
 
 
+#HELPER FUNCTIONS#
 def setup(conn=None, cursor=None):
     print "running setup"
     os.mkdir(out_dir)
     os.mkdir(os.path.join(out_dir, images_folder))
     create_database(conn, cursor)
-
-
-def create_database(conn=None, cursor=None):
-    if conn is None:
-        conn = sqlite3.connect(os.path.join(out_dir, db_name))
-        cursor = conn.cursor()
-
-    cursor.execute('''CREATE TABLE movies (
-            filename TEXT,
-            title TEXT,
-            year INTEGER,
-            released TEXT,
-            genre TEXT,
-            rating REAL,
-            runtime TEXT,
-            director TEXT,
-            actors TEXT,
-            plot TEXT,
-            poster TEXT
-            )''')
-    cursor.execute('CREATE UNIQUE INDEX filename_index ON movies (filename)')
-    conn.commit()
 
 
 def is_movie_file(filename):
@@ -47,17 +28,7 @@ def is_movie_file(filename):
         return False
 
 
-def is_in_db(conn, cur, filename):
-    if conn is None:
-        return False
-    else:
-        res = cur.execute('SELECT * FROM movies WHERE filename=?',
-                (filename,)).fetchall()
-        if len(res) > 0:
-            return True
-        else:
-            return False
-
+#MAIN#
 if __name__ == '__main__':
     if len(sys.argv) == 1:
         # no args, use curdir
