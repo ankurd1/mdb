@@ -3,13 +3,13 @@ moviedirbrowser (mdb)
 
 Todo
 ----
-[done]- Windows support
+- Windows support[DONE]
 - Release on github pages
 - Add a test case to test gui.py launch capabilities
 - Give out for betas
-	- GUI layout on different res
+	- GUI layout on different res [DONE]
 	- Launching on win/linux
-		- Add a file selection dialog
+		- Add a file selection dialog [DONE]
 		- nautilus-script for gnome
 		- right-click handler/integ for win
 	- Distribution on win/linux
@@ -28,7 +28,7 @@ Optional
 - Use opensubs database in addition to file name
 - Option to download subs
 - Cache the GUI output
-[done]- Sort by rating, year, title
+- Sort by rating, year, title[DONE]
 - Search for actor, diroector, genre
 - Replace GUI by js/css/html app
 - Convert this into a web app

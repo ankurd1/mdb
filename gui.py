@@ -51,8 +51,14 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         self.lst.InsertColumn(4, "Runtime")
         self.lst.InsertColumn(5, "Details")
 
+        self.lst.SetColumnWidth(0, 150)
+        self.lst.SetColumnWidth(1, 50)
+        self.lst.SetColumnWidth(2, 50)
+        self.lst.SetColumnWidth(3, 100)
+        self.lst.SetColumnWidth(4, 100)
         self.lst.SetColumnWidth(5, -3)
 
+        self.display_width = wx.GetDisplaySize()[0]
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.lst, 1, wx.EXPAND)
         self.SetSizer(sizer)
@@ -171,7 +177,9 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
     def generate_label_text(self, data):
         heading_width = 10
-        total_width = 70
+        pix_per_char = 13 # very approx value
+        total_width = int((self.display_width - 500) / pix_per_char)
+        print total_width
         sep = ':  '
 
         data2 = [('Title', unicode(data['title'])),
