@@ -3,8 +3,19 @@ moviedirbrowser (mdb)
 
 Todo
 ----
-- Windows support
+[done]- Windows support
 - Release on github pages
+- Give out for betas
+	- GUI layout on different res
+	- Launching on win/linux
+		- Add a file selection dialog
+		- nautilus-script for gnome
+		- right-click handler/integ for win
+	- Distribution on win/linux
+		- distribute src package on lin, with an installer
+		- py2exe 32-bit compiled and zipped for windows, script to add rt-click
+		  desktop shortcuts etc
+		  OR installer
 
 Bugs
 ----

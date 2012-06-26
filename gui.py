@@ -24,6 +24,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         wx.Frame.__init__(self, parent, -1, "MDB")
         self.Bind(wx_signal.EVT_FILE_DONE, self.on_file_done)
         self.connect_to_db()
+        self.add_menu()
 
         # Build the list
         self.itemDataMap = {}
@@ -32,7 +33,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
                 agwStyle=wx.LC_REPORT | wx.LC_VRULES | wx.LC_HRULES |
                 wx.LC_SINGLE_SEL | ULC.ULC_HAS_VARIABLE_ROW_HEIGHT)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick, self.lst)
-        ColumnSorterMixin.__init__(self, 5)
+        ColumnSorterMixin.__init__(self, 6)
 
         self.lst.InsertColumn(0, "Title")
         self.lst.InsertColumn(1, "Rating")
@@ -47,6 +48,30 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         sizer.Add(self.lst, 1, wx.EXPAND)
         self.SetSizer(sizer)
         self.Layout()
+
+    def add_menu(self):
+        menuBar = wx.MenuBar()
+        menu = wx.Menu()
+
+        m_open = menu.Append(wx.ID_ANY, "&Open Folder\tCtrl-O", "Open a folder.")
+        self.Bind(wx.EVT_MENU, self.open_folder, m_open)
+
+        menuBar.Append(menu, "&File")
+
+        menu = wx.Menu()
+
+        m_about = menu.Append(wx.ID_ANY, "&About", "Information about this program")
+        self.Bind(wx.EVT_MENU, self.on_about, m_about)
+
+        menuBar.Append(menu, "&Help")
+
+        self.SetMenuBar(menuBar)
+
+    def open_folder(self, evt):
+        print 'open folder not implemented yet'
+
+    def on_about(self, evt):
+        print 'on_about not implemented yet'
 
     def GetListCtrl(self):
         return self.lst
