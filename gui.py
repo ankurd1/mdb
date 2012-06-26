@@ -34,41 +34,45 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         self.connect_to_db()
         self.add_menu()
 
-        # Build the list
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(self.sizer)
+
+        self.display_width = wx.GetDisplaySize()[0]
         self.itemDataMap = {}
 
-        self.lst = ULC.UltimateListCtrl(
+        self.lst = self.build_list()
+        ColumnSorterMixin.__init__(self, 6)
+        self.sizer.Add(self.lst, 1, wx.EXPAND)
+        self.Layout()
+
+    def build_list(self):
+        lst = ULC.UltimateListCtrl(
             self, wx.ID_ANY, agwStyle=wx.LC_REPORT | wx.LC_VRULES |
             wx.LC_HRULES | wx.LC_SINGLE_SEL | ULC.ULC_HAS_VARIABLE_ROW_HEIGHT)
 
-        self.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick, self.lst)
-        ColumnSorterMixin.__init__(self, 6)
+        self.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick, lst)
 
-        self.lst.InsertColumn(0, "Title")
-        self.lst.InsertColumn(1, "Rating")
-        self.lst.InsertColumn(2, "Year")
-        self.lst.InsertColumn(3, "Genre")
-        self.lst.InsertColumn(4, "Runtime")
-        self.lst.InsertColumn(5, "Details")
+        lst.InsertColumn(0, "Title")
+        lst.InsertColumn(1, "Rating")
+        lst.InsertColumn(2, "Year")
+        lst.InsertColumn(3, "Genre")
+        lst.InsertColumn(4, "Runtime")
+        lst.InsertColumn(5, "Details")
 
-        self.lst.SetColumnWidth(0, 150)
-        self.lst.SetColumnWidth(1, 50)
-        self.lst.SetColumnWidth(2, 50)
-        self.lst.SetColumnWidth(3, 100)
-        self.lst.SetColumnWidth(4, 100)
-        self.lst.SetColumnWidth(5, -3)
+        lst.SetColumnWidth(0, 150)
+        lst.SetColumnWidth(1, 50)
+        lst.SetColumnWidth(2, 50)
+        lst.SetColumnWidth(3, 100)
+        lst.SetColumnWidth(4, 100)
+        lst.SetColumnWidth(5, -3)
 
-        self.display_width = wx.GetDisplaySize()[0]
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.lst, 1, wx.EXPAND)
-        self.SetSizer(sizer)
-        self.Layout()
+        return lst
 
     def add_menu(self):
         menuBar = wx.MenuBar()
         menu = wx.Menu()
 
-        m_open = menu.Append(wx.ID_ANY, "&Open Folder\tCtrl-O",
+        m_open = menu.Append(wx.ID_ANY, "&Open Folder\tCtrl+O",
                              "Open a folder.")
         self.Bind(wx.EVT_MENU, self.open_folder, m_open)
 
@@ -98,8 +102,18 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
         dlg.Destroy()
 
+        #create new lst
+        self.itemDataMap.clear()
+        self.lst.Destroy()
+        self.lst = self.build_list()
+        ColumnSorterMixin.__init__(self, 6)
+        self.sizer.Add(self.lst, 1, wx.EXPAND)
+        self.Layout()
+        self.Refresh()
+
+        #print "selected", self.lst.GetSelectedItemCount()
+
         # switch to this dir
-        self.lst.DeleteAllItems()
         os.chdir(target_dir)
 
         self.connect_to_db()
@@ -296,6 +310,10 @@ if __name__ == '__main__':
         files_with_data = []
         files_wo_data = []
 
+        #make all target_files non_absolute
+        for i in range(len(target_files)):
+            target_files[i] = os.path.basename(target_files[i])
+
         # out_dir is always spsd to be in cwd
         if (os.path.exists(out_dir)):
             conn = sqlite3.connect(os.path.join(out_dir, db_name))
@@ -329,7 +347,7 @@ if __name__ == '__main__':
         setup(None, None)
 
     #spawn threads
-    app = wx.App()
+    app = wx.App(redirect=True)
     frame = MyFrame(None)
     app.SetTopWindow(frame)
     frame.Maximize()

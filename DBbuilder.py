@@ -110,7 +110,11 @@ def get_movie_name(filename):
 
 
 def get_imdb_data(moviename):
-    res = json.load(urllib2.urlopen(api_url + urllib2.quote(moviename)))
+    try:
+        res = json.load(urllib2.urlopen(api_url + urllib2.quote(moviename)))
+    except urllib2.URLError, e:
+        return None
+
     if (res['Response'] == 'True'):
         return res
     else:

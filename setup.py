@@ -7,11 +7,12 @@ except ImportError, e:
     pass
 
 setup(name='MDB',
-        version='0.8',
+        version='0.8a',
         description='Browse imdb data for a folder full of movies!',
         author='Ankur Dahiya',
         author_email='legalos.lotr@gmail.com',
         package_dir={'mdb':''},
         packages=['mdb'],
-        windows=[{'script':'gui.py'}]
+        windows=[{'script':'gui.py'}],
+        url='https://github.com/legalosLOTR/mdb'
         )
