@@ -5,19 +5,28 @@ import wx
 import wx.lib.agw.ultimatelistctrl as ULC
 from wx.lib.mixins.listctrl import ColumnSorterMixin
 import sqlite3
-from DBbuilder import out_dir, db_name, images_folder
+from DBbuilder import out_dir, db_name, images_folder, create_database,\
+        is_in_db, DBbuilderThread
 import os
 from textwrap import wrap
 import threading
 import wx_signal
 
 
+#CONSTANTS#
+movie_formats = ['avi', 'mkv', 'mp4']
+
+
 #CLASSES#
 class MyFrame(wx.Frame, ColumnSorterMixin):
     def connect_to_db(self):
-        self.conn = sqlite3.connect(os.path.join(out_dir, db_name))
-        self.conn.row_factory = sqlite3.Row
-        self.cursor = self.conn.cursor()
+        if (os.path.exists(out_dir)):
+            self.conn = sqlite3.connect(os.path.join(out_dir, db_name))
+            self.conn.row_factory = sqlite3.Row
+            self.cursor = self.conn.cursor()
+        else:
+            self.conn = None
+            self.cursor = None
 
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, -1, "MDB")
@@ -183,3 +192,115 @@ class GuiThread(threading.Thread):
 
         self.frame.Show()
         app.MainLoop()
+
+
+#HELPER FUNCTIONS#
+def setup(conn=None, cursor=None):
+    print "running setup"
+    os.mkdir(out_dir)
+    os.mkdir(os.path.join(out_dir, images_folder))
+    create_database(conn, cursor)
+
+
+def is_movie_file(filename):
+    if (filename[-3:] in movie_formats):
+        return True
+    else:
+        return False
+
+
+def start_dbbuilder(frame, files_wo_data, parent_dir):
+    db_thread = DBbuilderThread(frame, files_wo_data, parent_dir)
+    db_thread.start()
+
+
+def process_dir(directory):
+    files_with_data = []
+    files_wo_data = []
+
+    for fil in os.listdir(directory):
+        if os.path.isdir(fil):
+            fil_children = os.listdir(fil)
+            for c in fil_children:
+                if is_movie_file(c):
+                    if is_in_db(conn, cur, c):
+                        files_with_data.append(c)
+                    else:
+                        files_wo_data.append(c)
+        else:
+            if is_movie_file(fil):
+                if is_in_db(conn, cur, fil):
+                    files_with_data.append(fil)
+                else:
+                    files_wo_data.append(fil)
+    return files_with_data, files_wo_data
+
+
+#MAIN#
+if __name__ == '__main__':
+    if len(sys.argv) == 1:
+        # no args, use curdir
+        target_files = [os.getcwd()]
+    else:
+        target_files = sys.argv[1:]
+
+    if (len(target_files) == 1 and os.path.isdir(target_files[0])):
+        os.chdir(target_files[0])
+        # out_dir is always spsd to be in cwd
+        if (os.path.exists(out_dir)):
+            conn = sqlite3.connect(os.path.join(out_dir, db_name))
+            cur = conn.cursor()
+        else:
+            conn = None
+            cur = None
+        files_with_data, files_wo_data = process_dir('.')
+    else:
+        files_with_data = []
+        files_wo_data = []
+
+        # out_dir is always spsd to be in cwd
+        if (os.path.exists(out_dir)):
+            conn = sqlite3.connect(os.path.join(out_dir, db_name))
+            cur = conn.cursor()
+        else:
+            conn = None
+            cur = None
+
+        for fil in target_files:
+            if os.path.isdir(fil):
+                fil_children = os.listdir(fil)
+                for c in fil_children:
+                    if is_movie_file(c):
+                        if is_in_db(conn, cur, c):
+                            files_with_data.append(c)
+                        else:
+                            files_wo_data.append(c)
+            else:
+                if is_movie_file(fil):
+                    if is_in_db(conn, cur, fil):
+                        files_with_data.append(fil)
+                    else:
+                        files_wo_data.append(fil)
+
+    print 'files_with_data', files_with_data
+    print 'files_wo_data', files_wo_data
+
+    # setup
+    if ((len(files_with_data) + len(files_wo_data) > 0) and 
+            (not os.path.exists(out_dir))):
+        setup(None, None)
+
+    #spawn threads
+    app = wx.App()
+    frame = MyFrame(None)
+    app.SetTopWindow(frame)
+    frame.Maximize()
+
+    for f in files_with_data:
+        frame.add_row(f)
+
+    if len(files_wo_data) > 0:
+        start_dbbuilder(frame, files_wo_data, '.')
+
+    frame.Show()
+    app.MainLoop()

@@ -13,5 +13,5 @@ setup(name='MDB',
         author_email='legalos.lotr@gmail.com',
         package_dir={'mdb':''},
         packages=['mdb'],
-        windows=[{'script':'launcher.py'}]
+        windows=[{'script':'gui.py'}]
         )
