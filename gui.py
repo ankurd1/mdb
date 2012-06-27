@@ -252,6 +252,8 @@ def check_and_setup():
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
     else:
+        try: shutil.rmtree(mdb_dir)
+        except: pass
         os.mkdir(mdb_dir)
         os.mkdir(os.path.join(mdb_dir, images_folder))
         conn = sqlite3.connect(os.path.join(mdb_dir, db_name))

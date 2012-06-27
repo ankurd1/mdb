@@ -40,11 +40,15 @@ def setup_db_dir():
     try: shutil.rmtree('test')
     except: pass
     os.mkdir('test')
-    home_old = os.environ['HOME']
-    os.environ['HOME'] = os.path.abspath('./test')
+
+    home_var = 'HOME'
+    if (home_var not in os.environ):
+        home_var = 'USERPROFILE'
+    home_old = os.environ[home_var]
+    os.environ[home_var] = os.path.abspath('./test')
     conn, cur, mdb_dir = check_and_setup()
 
-    os.environ['HOME'] = home_old
+    os.environ[home_var] = home_old
 
     return conn, cur, mdb_dir
 
