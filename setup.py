@@ -14,5 +14,6 @@ setup(name='MDB',
         package_dir={'mdb':''},
         packages=['mdb'],
         windows=[{'script':'gui.py'}],
+        console=[{'script':'reg-gen.py'}],
         url='https://github.com/legalosLOTR/mdb'
         )

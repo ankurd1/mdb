@@ -1,0 +1,36 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\*\shell]
+
+[HKEY_CLASSES_ROOT\*\shell\MDB]
+
+[HKEY_CLASSES_ROOT\*\shell\MDB\command]
+@="PATH_TO_GUI"
+
+
+[HKEY_CLASSES_ROOT\Directory\Background]
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell]
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\MDB]
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\MDB\command]
+@="PATH_TO_GUI"
+
+
+[HKEY_CLASSES_ROOT\Directory\shell]
+
+[HKEY_CLASSES_ROOT\Directory\shell\MDB]
+
+[HKEY_CLASSES_ROOT\Directory\shell\MDB\command]
+@="PATH_TO_GUI \"%1\""
+
+
+[HKEY_CLASSES_ROOT\LibraryFolder\background]
+
+[HKEY_CLASSES_ROOT\LibraryFolder\background\shell]
+
+[HKEY_CLASSES_ROOT\LibraryFolder\background\shell\MDB]
+
+[HKEY_CLASSES_ROOT\LibraryFolder\background\shell\MDB\command]
+@="PATH_TO_GUI"

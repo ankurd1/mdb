@@ -15,11 +15,11 @@ MDB runs on Windows and Linux.
 ### Linux
 Download the zip from [here](http://example.com) and extract it somewhere.
 
-If you want to enable right-click shortcuts for gnome, copy the mdb-launcher.py
-file to ~/.gnome2/nautilus-scripts.
-```
-cp mdb-launcher.py ~/.gnome2/nautilus-scripts/mdb && chmod u+x ~/.gnome2/nautilus-scripts/mdb
-```
+If you want to enable right-click shortcuts in nautilus(gnome), run 
+nautilus-shortcuts.py.
+This script moves nautilus-script.template to ~/.gnome2/nautilus-scripts
+after appropriately changing the path to MDB installation.
+Note: You will have to run this everytime you move the MDB installation.
 
 ### Windows
 Download the zip from [here](http://example.com) and extract it somewhere.
