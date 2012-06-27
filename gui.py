@@ -9,7 +9,6 @@ from DBbuilder import out_dir, db_name, images_folder, create_database,\
         is_in_db, DBbuilderThread
 import os
 from textwrap import wrap
-import threading
 import wx_signal
 
 
@@ -19,19 +18,13 @@ movie_formats = ['avi', 'mkv', 'mp4']
 
 #CLASSES#
 class MyFrame(wx.Frame, ColumnSorterMixin):
-    def connect_to_db(self):
-        if (os.path.exists(out_dir)):
-            self.conn = sqlite3.connect(os.path.join(out_dir, db_name))
-            self.conn.row_factory = sqlite3.Row
-            self.cursor = self.conn.cursor()
-        else:
-            self.conn = None
-            self.cursor = None
-
-    def __init__(self, parent):
+    def __init__(self, parent, conn, cur, mdb_dir):
         wx.Frame.__init__(self, parent, -1, "MDB")
+        self.conn = conn
+        self.cur = cur
+        self.mdb_dir = mdb_dir
+
         self.Bind(wx_signal.EVT_FILE_DONE, self.on_file_done)
-        self.connect_to_db()
         self.add_menu()
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
@@ -111,25 +104,16 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         self.Layout()
         self.Refresh()
 
-        #print "selected", self.lst.GetSelectedItemCount()
-
         # switch to this dir
         os.chdir(target_dir)
 
-        self.connect_to_db()
-
-        files_with_data, files_wo_data = process_dir('.', self.conn, self.cursor)
-
-        if ((len(files_with_data) + len(files_wo_data) > 0) and
-                (not os.path.exists(out_dir))):
-            setup(None, None)
-            self.connect_to_db()
+        files_with_data, files_wo_data = process_dir('.', self.conn, self.cur)
 
         for f in files_with_data:
             self.add_row(f)
 
         if len(files_wo_data) > 0:
-            start_dbbuilder(self, files_wo_data, os.path.abspath('.'))
+            start_dbbuilder(self, files_wo_data, self.mdb_dir)
 
     def on_about(self, evt):
         print 'on_about not implemented yet'
@@ -160,13 +144,13 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
                 expand=True)
 
     def get_from_db(self, filename):
-        res = self.cursor.execute('SELECT * FROM movies WHERE filename=?',
+        res = self.cur.execute('SELECT * FROM movies WHERE filename=?',
                 (filename,)).fetchall()
         return res[0]
 
     def build_info_panel(self, data):
         panel_3 = wx.Panel(self.lst, -1)
-        img_file = os.path.join(out_dir, images_folder,
+        img_file = os.path.join(self.mdb_dir, images_folder,
                 data['filename'] + '.jpg')
         if os.path.exists(img_file):
             bmp = wx.Bitmap(img_file)
@@ -191,7 +175,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
     def generate_label_text(self, data):
         heading_width = 10
-        pix_per_char = 13 # very approx value
+        pix_per_char = 13   # very approx value
         total_width = int((self.display_width - 500) / pix_per_char)
         print total_width
         sep = ':  '
@@ -224,36 +208,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         self.add_row(evt.filename)
 
 
-class GuiThread(threading.Thread):
-    def __init__(self, files):
-        threading.Thread.__init__(self)
-        self.files = files
-        self.frame = None
-
-    def run(self):
-        """Overrides Thread.run. Don't call this directly its called internally
-        when you call Thread.start().
-        """
-        app = wx.App()
-        self.frame = MyFrame(None)
-        app.SetTopWindow(self.frame)
-        self.frame.Maximize()
-
-        for f in self.files:
-            self.frame.add_row(f)
-
-        self.frame.Show()
-        app.MainLoop()
-
-
 #HELPER FUNCTIONS#
-def setup(conn=None, cursor=None):
-    print "running setup"
-    os.mkdir(out_dir)
-    os.mkdir(os.path.join(out_dir, images_folder))
-    create_database(conn, cursor)
-
-
 def is_movie_file(filename):
     if (filename[-3:] in movie_formats):
         return True
@@ -261,8 +216,8 @@ def is_movie_file(filename):
         return False
 
 
-def start_dbbuilder(frame, files_wo_data, parent_dir):
-    db_thread = DBbuilderThread(frame, files_wo_data, parent_dir)
+def start_dbbuilder(frame, files_wo_data, mdb_dir):
+    db_thread = DBbuilderThread(frame, files_wo_data, mdb_dir)
     db_thread.start()
 
 
@@ -288,23 +243,36 @@ def process_dir(directory, conn, cur):
     return files_with_data, files_wo_data
 
 
+def check_and_setup():
+    mdb_dir = os.path.join(os.path.expanduser('~'), out_dir)
+    if (os.path.exists(mdb_dir) and\
+            os.path.exists(os.path.join(mdb_dir, db_name)) and\
+            os.path.exists(os.path.join(mdb_dir, images_folder))):
+        conn = sqlite3.connect(os.path.join(mdb_dir, db_name))
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+    else:
+        os.mkdir(mdb_dir)
+        os.mkdir(os.path.join(mdb_dir, images_folder))
+        conn = sqlite3.connect(os.path.join(mdb_dir, db_name))
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        create_database(conn, cur)
+
+    return conn, cur, mdb_dir
+
+
 #MAIN#
 if __name__ == '__main__':
+    conn, cur, mdb_dir = check_and_setup()
     if len(sys.argv) == 1:
         # no args, use curdir
-        target_files = [os.getcwd()]
+        target_files = None
     else:
         target_files = sys.argv[1:]
 
-    if (len(target_files) == 1 and os.path.isdir(target_files[0])):
-        os.chdir(target_files[0])
-        # out_dir is always spsd to be in cwd
-        if (os.path.exists(out_dir)):
-            conn = sqlite3.connect(os.path.join(out_dir, db_name))
-            cur = conn.cursor()
-        else:
-            conn = None
-            cur = None
+    if (target_files is None):
+        # use cwd as target_files
         files_with_data, files_wo_data = process_dir('.', conn, cur)
     else:
         files_with_data = []
@@ -313,14 +281,6 @@ if __name__ == '__main__':
         #make all target_files non_absolute
         for i in range(len(target_files)):
             target_files[i] = os.path.basename(target_files[i])
-
-        # out_dir is always spsd to be in cwd
-        if (os.path.exists(out_dir)):
-            conn = sqlite3.connect(os.path.join(out_dir, db_name))
-            cur = conn.cursor()
-        else:
-            conn = None
-            cur = None
 
         for fil in target_files:
             if os.path.isdir(fil):
@@ -341,14 +301,9 @@ if __name__ == '__main__':
     print 'files_with_data', files_with_data
     print 'files_wo_data', files_wo_data
 
-    # setup
-    if ((len(files_with_data) + len(files_wo_data) > 0) and
-            (not os.path.exists(out_dir))):
-        setup(None, None)
-
     #spawn threads
-    app = wx.App(redirect=True)
-    frame = MyFrame(None)
+    app = wx.App(redirect=False)
+    frame = MyFrame(None, conn, cur, mdb_dir)
     app.SetTopWindow(frame)
     frame.Maximize()
 
@@ -356,7 +311,7 @@ if __name__ == '__main__':
         frame.add_row(f)
 
     if len(files_wo_data) > 0:
-        start_dbbuilder(frame, files_wo_data, os.path.abspath('.'))
+        start_dbbuilder(frame, files_wo_data, mdb_dir)
 
     frame.Show()
     app.MainLoop()

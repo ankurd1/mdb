@@ -6,17 +6,27 @@ Todo
 - Windows support[DONE]
 - Release on github pages
 - Add a test case to test gui.py launch capabilities
+- Add multiple files rtclick support for windows
 - Give out for betas
 	- GUI layout on different res [DONE]
 	- Launching on win/linux
 		- Add a file selection dialog [DONE]
-		- nautilus-script for gnome
-		- right-click handler/integ for win
+		- Remove single folder rtclick feature [DONE]
+		- windows
+			- rtclick on a vid file
+			- rtclick on folder bg
+			- use ctrl+o
+		- linux
+			- rtclick multiple files/folders
+			- rtclick on folder bg
+			- use ctrl+o
+			- pass multiple args
 	- Distribution on win/linux
 		- distribute src package on lin, with an installer
 		- py2exe 32-bit compiled and zipped for windows, script to add rt-click
 		  desktop shortcuts etc
 		  OR installer
+    - Write a more detailed README
 
 Bugs
 ----

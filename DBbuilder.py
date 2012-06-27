@@ -39,19 +39,8 @@ def zenity_error(msg):
         sys.stderr.write(msg + '\n')
 
 
-def setup(conn=None, cursor=None):
-    print "running setup"
-    os.mkdir(out_dir)
-    os.mkdir(os.path.join(out_dir, images_folder))
-    create_database(conn, cursor)
-
-
-def create_database(conn=None, cursor=None):
-    if conn is None:
-        conn = sqlite3.connect(os.path.join(out_dir, db_name))
-        cursor = conn.cursor()
-
-    cursor.execute('''CREATE TABLE movies (
+def create_database(conn, cur):
+    cur.execute('''CREATE TABLE movies (
             filename TEXT,
             title TEXT,
             year INTEGER,
@@ -64,12 +53,12 @@ def create_database(conn=None, cursor=None):
             plot TEXT,
             poster TEXT
             )''')
-    cursor.execute('CREATE UNIQUE INDEX filename_index ON movies (filename)')
+    cur.execute('CREATE UNIQUE INDEX filename_index ON movies (filename)')
     conn.commit()
 
 
-def add_to_db(filename, file_data, conn, cursor):
-    cursor.execute('INSERT INTO movies VALUES(?,?,?,?,?,?,?,?,?,?,?)', (
+def add_to_db(filename, file_data, conn, cur):
+    cur.execute('INSERT INTO movies VALUES(?,?,?,?,?,?,?,?,?,?,?)', (
         filename, file_data['Title'], file_data['Year'],
         file_data['Released'], file_data['Genre'], file_data['imdbRating'],
         file_data['Runtime'], file_data['Director'], file_data['Actors'],
@@ -135,11 +124,11 @@ def is_in_db(conn, cur, filename):
 
 #CLASSES#
 class DBbuilderThread(threading.Thread):
-    def __init__(self, parent, files, directory):
+    def __init__(self, parent, files, mdb_dir):
         threading.Thread.__init__(self)
         self.parent = parent
         self.files = files
-        self.directory = directory
+        self.mdb_dir = mdb_dir
 
     def run(self):
         """Overrides Thread.run. Don't call this directly its called internally
@@ -153,7 +142,7 @@ class DBbuilderThread(threading.Thread):
         evt = wx_signal.FileDoneEvent(wx_signal.myEVT_FILE_DONE, -1, filename)
         wx.PostEvent(self.parent, evt)
 
-    def process_file(self, filename, conn, cursor):
+    def process_file(self, filename, conn, cur):
         file_data = get_imdb_data(get_movie_name(filename))
         if (file_data is None):
             print "None data from imdb for", filename
@@ -165,11 +154,11 @@ class DBbuilderThread(threading.Thread):
 
         if (file_data is not None):
             # Add to db, save img, send signal
-            add_to_db(filename, file_data, conn, cursor)
+            add_to_db(filename, file_data, conn, cur)
             if file_data['Poster'] is not None:
                 # save image
                 img_url = file_data['Poster'][:-7] + img_size + '.jpg'
-                img_file = os.path.join(self.directory, out_dir, images_folder,
+                img_file = os.path.join(self.mdb_dir, images_folder,
                                         filename + '.jpg')
                 img_fh = open(img_file, 'wb')
                 img_fh.write(urllib2.urlopen(img_url).read())
@@ -184,12 +173,12 @@ class DBbuilderThread(threading.Thread):
         if (https_proxy is not None):
             os.environ['https_proxy'] = https_proxy
 
-        conn = sqlite3.connect(os.path.join(self.directory, out_dir, db_name))
-        cursor = conn.cursor()
+        conn = sqlite3.connect(os.path.join(self.mdb_dir, db_name))
+        cur = conn.cursor()
 
         try:
             for filename in self.files:
-                self.process_file(filename, conn, cursor)
+                self.process_file(filename, conn, cur)
         except Exception, e:
             zenity_error(str(e))
             raise

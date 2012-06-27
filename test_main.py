@@ -6,7 +6,8 @@ import os
 import shutil
 import wx_signal
 from gui import MyFrame
-from gui import setup as db_dir_setup
+from gui import check_and_setup
+from DBbuilder import images_folder
 
 
 #DATA#
@@ -34,7 +35,18 @@ movies2 = [('social network', ('The Social Network', '2010')),
 
 movie_filenames = ['Die Welle[2008]DvDrip[Ger]-FXG.avi',
     'J.Edgar[2011]BRRip XviD-ETRG.avi']
+#SETUP FUNCTIONS#
+def setup_db_dir():
+    try: shutil.rmtree('test')
+    except: pass
+    os.mkdir('test')
+    home_old = os.environ['HOME']
+    os.environ['HOME'] = os.path.abspath('./test')
+    conn, cur, mdb_dir = check_and_setup()
 
+    os.environ['HOME'] = home_old
+
+    return conn, cur, mdb_dir
 
 #TEST CASES#
 def test_name_parser():
@@ -57,19 +69,16 @@ def test_get_imdb_data_existence():
 
 
 def test_dbbuilder_images():
-    if os.path.exists('.mdb'):
-        shutil.rmtree('.mdb')
-
-    db_dir_setup()
+    conn, cur, mdb_dir = setup_db_dir()
 
     dbthread = DBbuilder.DBbuilderThread(None, [item[0] for item in movies1],
-            '.')
+            mdb_dir)
     dbthread.start()
     dbthread.join()
 
     for item in movies1:
         if item[2]:
-            assert(os.path.exists(os.path.join('.mdb', 'images',
+            assert(os.path.exists(os.path.join(mdb_dir, images_folder,
                 item[0] + '.jpg')))
         else:
             assert(True)
@@ -90,30 +99,29 @@ class CountingFrame(wx.Frame):
 
 
 def test_DBbuilder_signal():
-    if os.path.exists('.mdb'):
-        shutil.rmtree('.mdb')
-
-    db_dir_setup()
+    conn, cur, mdb_dir = setup_db_dir()
 
     app = wx.App(False)
     frame = CountingFrame(None, total=len(movies1))
 
     dbthread = DBbuilder.DBbuilderThread(frame, [item[0] for item in movies1],
-            '.')
+            mdb_dir)
     dbthread.start()
 
     app.MainLoop()
 
 
 def test_gui_row_addition():
+    conn, cur, mdb_dir = setup_db_dir()
+
     app = wx.App()
-    frame = MyFrame(None)
+    frame = MyFrame(None, conn, cur, mdb_dir)
     app.SetTopWindow(frame)
     frame.Maximize()
-
-    for f in movies1:
-        frame.add_row(f[0])
-
     frame.Show()
-    print frame.label_1.GetLabel()
+
+    dbthread = DBbuilder.DBbuilderThread(frame, [item[0] for item in movies1],
+            mdb_dir)
+    dbthread.start()
+
     app.MainLoop()
