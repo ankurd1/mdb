@@ -3,7 +3,7 @@
 from subprocess import call
 import os
 
-MDB_LOCATION = 'MDB_PATH'
+MDB_EXECUTABLE = 'MDB'
 
 def zenity_error(msg):
     call(['zenity', '--error', '--text', msg])
@@ -16,9 +16,9 @@ for i in range(len(filePathList)):
 
 try:
     if len(filePathList) == 0:
-        call([os.path.join(MDB_LOCATION, 'gui.py')])
+        call([MDB_EXECUTABLE])
     else:
-        call_list = [os.path.join(MDB_LOCATION, 'gui.py')]
+        call_list = [MDB_EXECUTABLE]
         call_list.extend(filePathList)
         call(call_list)
 except Exception, e:

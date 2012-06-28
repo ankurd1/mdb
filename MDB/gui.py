@@ -265,7 +265,7 @@ def check_and_setup():
 
 
 #MAIN#
-if __name__ == '__main__':
+def main():
     conn, cur, mdb_dir = check_and_setup()
     if len(sys.argv) == 1:
         # no args, use curdir
@@ -317,3 +317,6 @@ if __name__ == '__main__':
 
     frame.Show()
     app.MainLoop()
+
+if __name__ == '__main__':
+    main()
