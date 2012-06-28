@@ -18,7 +18,7 @@ try:
     if len(filePathList) == 0:
         call([os.path.join(MDB_LOCATION, 'gui.py')])
     else:
-        call([os.path.join(MDB_LOCATION, 'gui.py')])
+        call_list = [os.path.join(MDB_LOCATION, 'gui.py')]
         call_list.extend(filePathList)
         call(call_list)
 except Exception, e:
