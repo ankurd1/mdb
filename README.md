@@ -13,7 +13,7 @@ MDB runs on Windows and Linux.
 ## Installation
 
 ### Linux
-Download the zip from [here](https://legalosLOTR.github.com/mdb)
+Download the zip from [here](http://legalosLOTR.github.com/mdb)
 and extract it somewhere.
 MDB depends on wxPython, so before you run it, install wx:
 ```
@@ -27,7 +27,7 @@ after appropriately changing the path to MDB installation.
 Note: You will have to run this everytime you move the MDB installation.
 
 ### Windows
-Download the zip from [here](https://legalosLOTR.github.com/mdb)
+Download the zip from [here](http://legalosLOTR.github.com/mdb)
 and extract it somewhere.
 
 If you want to enable right-click shortcuts, double-click reg-gen.exe to
