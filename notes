@@ -1,18 +1,29 @@
 moviedirbrowser (mdb)
 ###############
 
-Todo
+Todo (* means high priority)
 ----
-- Windows support[DONE]
--proxy support
-- Release on github pages
-- Add a test case to test gui.py launch capabilities
+- Proxy support
 - Add multiple files rtclick support for windows
-- Give out for betas
+- window resize
+- easier install methods
+- search for actor/director/genre/title
+- remove all error dialogs
+- better file match heuristics
+- folder rt-click should recurse
+- link to imdb site
+- Use opensubs database in addition to file name
+- Option to download subs
+- Add more test cases
+
+
+- Windows support[DONE]
+- Release on github pages[DONE]
+- Give out for betas[DONE]
 	- GUI layout on different res [DONE]
-	- Launching on win/linux
-		- Add a file selection dialog [DONE]
-		- Remove single folder rtclick feature [DONE]
+	- Launching on win/linux[DONE]
+		- Add a file selection dialog
+		- Remove single folder rtclick feature
 		- windows
 			- rtclick on a vid file
 			- rtclick on folder bg
@@ -27,24 +38,12 @@ Todo
 		- py2exe 32-bit compiled and zipped for windows, script to add rt-click
 		  desktop shortcuts etc
 		  OR installer
-    - Write a more detailed README
-	- Window resizing
-	- better install methods
+    - Write a more detailed README[DONE]
 
-Bugs
+Bugs(* means high priority)
 ----
-- What if arg is a single dir which is not root, i.e. its parent has out_dir.
 - Concurrency issues, working on 1 dir then user switches to another
-
-Optional
---------
-- Use opensubs database in addition to file name
-- Option to download subs
-- Cache the GUI output
-- Sort by rating, year, title[DONE]
-- Search for actor, diroector, genre
-- Replace GUI by js/css/html app
-- Convert this into a web app
-	- Crowdsource identification of movie
-	- Recommendation engine
-	- Promotion of piracy?
+- lots of files, gui becomes messed up on linux
+- cant select rows when clicked on details column
+- empty space beyond scrollbars on windows
+- file name contains CD1, then it falters
