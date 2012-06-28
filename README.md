@@ -13,7 +13,12 @@ MDB runs on Windows and Linux.
 ## Installation
 
 ### Linux
-Download the zip from [here](https://github.com/downloads/legalosLOTR/mdb/MDB-0.8a-linux.zip) and extract it somewhere.
+Download the zip from [here](https://github.com/downloads/legalosLOTR/mdb/MDB-0.8a-linux.zip)
+and extract it somewhere.
+MDB depends on wxPython, so before you run it, install wx:
+```
+sudo apt-get install python-wxgtk2.8
+```
 
 If you want to enable right-click shortcuts in nautilus(gnome), run 
 nautilus-shortcuts.py.
@@ -22,11 +27,13 @@ after appropriately changing the path to MDB installation.
 Note: You will have to run this everytime you move the MDB installation.
 
 ### Windows
-Download the zip from [here](https://github.com/downloads/legalosLOTR/mdb/MDB-0.8a-win32.zip) and extract it somewhere.
+Download the zip from [here](https://github.com/downloads/legalosLOTR/mdb/MDB-0.8a-win32.zip)
+and extract it somewhere.
 
 If you want to enable right-click shortcuts, double-click reg-gen.exe to
 generate a shortcuts.reg file; then double click the generated shortcuts.reg to
 add it to your registry.
+To remove these shortcuts, double-click remove-shortcuts.reg.
 
 ## Usage
 * Right-click anywhere in a movie folder and select MDB! (On linux, you would
