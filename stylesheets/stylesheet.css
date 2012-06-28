@@ -252,7 +252,7 @@ h2 {
 } 
 
 h3 {
-  color: #d5000d;
+  color: #584A4B;
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 8px;
@@ -369,3 +369,11 @@ footer a:hover {
 
 /* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
 @media only screen and (max-width: 479px) {}
+
+/* custom */
+.center {
+	text-align: center;
+}
+.stress {
+	color: red;
+}
