@@ -4,6 +4,7 @@ moviedirbrowser (mdb)
 Todo
 ----
 - Windows support[DONE]
+-proxy support
 - Release on github pages
 - Add a test case to test gui.py launch capabilities
 - Add multiple files rtclick support for windows
