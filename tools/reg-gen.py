@@ -4,7 +4,7 @@ import os
 
 if __name__ == '__main__':
     out_file_path = 'shortcuts.reg'
-    in_file_path = 'shortcuts-reg.template'
+    in_file_path = 'resources/templates/shortcuts-reg.template'
 
     new_path = os.path.join(os.getcwd(), 'gui.exe')
     new_path = new_path.replace('\\', '\\\\')
