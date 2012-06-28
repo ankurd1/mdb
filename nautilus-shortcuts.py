@@ -3,7 +3,7 @@
 import os
 
 out_file_path = os.path.expanduser('~/.gnome2/nautilus-scripts/MDB')
-in_file_path = 'nautilus-scripts.template'
+in_file_path = 'nautilus-script.template'
 
 if __name__ == '__main__':
     launcher_script_text = open(in_file_path).read()
