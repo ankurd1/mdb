@@ -43,11 +43,13 @@
 
         <section id="downloads" class="clearfix">
 		<a href="https://github.com/downloads/legalosLOTR/mdb/MDB-0.8a-linux5.zip"
-			id="download-linux" class="button">
+			id="download-linux" class="button"
+			onClick="_gaq.push(['_trackEvent', 'DistDownloads', 'Linux', 'MDB-0.8a-linux5.zip']);">
 			<span>Linux</span>
 		</a>
 		<a href="https://github.com/downloads/legalosLOTR/mdb/MDB-0.8a-win32-5.exe"
-			id="download-windows" class="button">
+			id="download-windows" class="button"
+			onClick="_gaq.push(['_trackEvent', 'DistDownloads', 'Windows', 'MDB-0.8a-win32-5.exe']);">
 			<span>Windows</span>
 		</a>
 		<a href="https://github.com/legalosLOTR/mdb" id="view-on-github" class="button">
@@ -82,7 +84,7 @@
 		<code>sudo apt-get install python-wxgtk2.8</code>
 		</pre>
 
-		To install MDB:
+		To install MDB, navigate to the MDB folder and run:
 		<pre>
 		<code>sudo python setup.py install</code>
 		</pre>
