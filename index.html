@@ -10,7 +10,23 @@
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <title>MDB by legalosLOTR</title>
+    <title>MDB - Movie Dir Browser</title>
+
+	<!--Google analytics -->
+	<script type="text/javascript">
+
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-33034719-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+	  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+
+	</script>
+
   </head>
 
   <body>
@@ -19,88 +35,93 @@
 
         <header>
           <h1>MDB</h1>
-          <h2>MDB (MovieDirBrowser) -  a cool way to visualize your movie collection and decide which movie to watch next! Run MDB on a folder or a set of files/folders and it downloads imdb data for all movie files found and shows it in a nice GUI.</h2>
+		  <h2>MDB (MovieDirBrowser) -  a cool way to visualize your movie
+			  collection and decide which movie to watch next! Run MDB on a folder
+			  or a set of files/folders and it downloads imdb data for all movie
+			  files found and shows it in a nice GUI.</h2>
         </header>
 
         <section id="downloads" class="clearfix">
-          <a
-			  href="http://bit.ly/KOGYXP" id="download-linux"
-			  class="button"><span>Linux</span></a>
-          <a
-			  href="http://bit.ly/MsdorV" id="download-windows" class="button"><span>Windows</span></a>
-          <a href="https://github.com/legalosLOTR/mdb" id="view-on-github" class="button"><span>View on GitHub</span></a>
-		  <p class='center stress'>Current Version: 0.8a</p>
+		<a href="https://github.com/downloads/legalosLOTR/mdb/MDB-0.8a-linux5.zip"
+			id="download-linux" class="button">
+			<span>Linux</span>
+		</a>
+		<a href="https://github.com/downloads/legalosLOTR/mdb/MDB-0.8a-win32-5.exe"
+			id="download-windows" class="button">
+			<span>Windows</span>
+		</a>
+		<a href="https://github.com/legalosLOTR/mdb" id="view-on-github" class="button">
+			<span>View on GitHub</span>
+		</a>
+		<p class='center stress'>Current Version: 0.8a</p>
         </section>
 
         <hr>
 
-        <section id="main_content">
-			<p class='center'><a href='images/screenshot.png'><img src='images/screenshot-small.png' title='Click for full size'></a></p>
-          <p>Run MDB on a folder or a set of files/folders and it downloads imdb 
-data for all movie files found and shows it in a nice GUI.</p>
+		<section id="main_content">
+		<p class='center'><a href='images/screenshot.png'>
+			<img src='images/screenshot-small.png' title='Click for full size'></a></p>
+		<p>Run MDB on a folder or a set of files/folders and it downloads imdb 
+		data for all movie files found and shows it in a nice GUI.</p>
 
-<p>You can then sort the movies by title, rating, runtime, releaseYear or Genre.
-All this data is cached on your computer, so we don't need to hit imdb
-the next time!</p>
+		<p>You can then sort the movies by title, rating, runtime, releaseYear or Genre.
+		All this data is cached on your computer, so we don't need to hit imdb
+		the next time!</p>
 
-<p>MDB runs on Windows and Linux.</p>
+		<p>MDB runs on Windows and Linux.</p>
 
-<h2>Installation</h2>
+		<h2>Installation</h2>
 
-<h3>Linux</h3>
+		<h3>Linux</h3>
 
-<p>Download the zip from <a href="http://bit.ly/KOGYXP">here</a>
-and extract it somewhere.
-MDB depends on wxPython, so before you run it, install wx:</p>
+		<p>Download the zip from <a href="#">here</a>
+		and extract it somewhere.
+		MDB depends on wxPython, so before you run it, install wx:</p>
 
-<pre><code>sudo apt-get install python-wxgtk2.8
-</code></pre>
+		<pre>
+		<code>sudo apt-get install python-wxgtk2.8</code>
+		</pre>
 
-<p>If you want to enable right-click shortcuts in nautilus(gnome), run 
-nautilus-shortcuts.py.
-This script moves nautilus-script.template to ~/.gnome2/nautilus-scripts
-after appropriately changing the path to MDB installation.<br>
-<em>Note:</em> You will have to run this everytime you move the MDB installation.</p>
+		To install MDB:
+		<pre>
+		<code>sudo python setup.py install</code>
+		</pre>
 
-<h3>Windows</h3>
+		<h3>Windows</h3>
 
-<p>Download the zip from <a	href="http://bit.ly/MsdorV">here</a>
-and extract it somewhere.</p>
+		<p>Download the setup from <a href="#">here</a>
+		and run it to install.</p>
 
-<p>If you want to enable right-click shortcuts, double-click reg-gen.exe to
-generate a shortcuts.reg file; then double click the generated shortcuts.reg to
-add it to your registry.
-<em>Note:</em> You will have to run this everytime you move the MDB installation.</p>
 
-<h2>Usage</h2>
+		<h2>Usage</h2>
 
-<ul>
-<li>Right-click anywhere in a movie folder and select MDB! (On linux, you would
-have to select scripts-&gt;MDB in the right-click menu).</li>
-<li>You can also right-click a file/folder and select MDB. On linux, you can even
-select multiple files/folders before right-clicking.</li>
-<li>Or you could just run gui.py OR gui.exe to launch the program. You can also
-provide arguments to the program, otherwise the current working dir would be
-scanned for movie files.</li>
-<li>Once the program is running, you can sort by clicking on a column name OR you
-can switch to another folder by selecting File-&gt;Open (Ctrl+O).</li>
-</ul><h2>Coming soon</h2>
+		<ul>
+			<li>Right-click anywhere in a movie folder and select MDB! (On linux, you would
+			have to select scripts-&gt;MDB in the right-click menu).</li>
+			<li>You can also right-click a file/folder and select MDB. On linux, you can even
+			select multiple files/folders before right-clicking.</li>
+			<li>Or you could just run gui.py OR gui.exe to launch the program. You can also
+			provide arguments to the program, otherwise the current working dir would be
+			scanned for movie files.</li>
+			<li>Once the program is running, you can sort by clicking on a column name OR you
+			can switch to another folder by selecting File-&gt;Open (Ctrl+O).</li>
+		</ul>
+		
+		<h2>Coming soon</h2>
 
-<ul>
-<li>Ability to download subtitles.</li>
-<li>Better installation methods.</li>
-<li>Proxy support.</li>
-<li>Ability to search for title/director/actor/genre.</li>
-</ul>
-        </section>
+		<ul>
+			<li>Ability to download subtitles.</li>
+			<li>Proxy support.</li>
+			<li>Ability to search for title/director/actor/genre.</li>
+		</ul>
+		</section>
 
-        <footer>
-          MDB is maintained by <a href="https://github.com/legalosLOTR">Ankur Dahiya</a><br>
-          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
-
-        
-      </div>
-    </div>
+		<footer>
+		MDB is maintained by <a href="https://github.com/legalosLOTR">Ankur Dahiya</a><br>
+		This page was generated by <a href="http://pages.github.com">GitHub Pages</a>.
+		Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
+		</footer>
+	</div>
+</div>
   </body>
 </html>
