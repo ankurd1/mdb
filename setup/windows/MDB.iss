@@ -5,7 +5,7 @@
 #define MyAppVersion "0.8a"
 #define MyAppPublisher "Ankur Dahiya"
 #define MyAppURL "http://legaloslotr.github.com/mdb"
-#define MyAppExeName "gui.exe"
+#define MyAppExeName "MDB.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -26,20 +26,19 @@ OutputBaseFilename=setup
 Compression=lzma
 SolidCompression=yes
 InternalCompressLevel=max
+ShowLanguageDialog=no
+OutputDir=..\..\Output
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}";
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
+Name: "rtshortcuts"; Description: "Enable right-click shortcuts in Explorer"
 
 [Files]
-Source: "C:\Users\envy\Desktop\moviedirbrowser\MDB-0.8a-win32-3\dist\gui.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\envy\Desktop\moviedirbrowser\MDB-0.8a-win32-3\dist\library.zip"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\envy\Desktop\moviedirbrowser\MDB-0.8a-win32-3\dist\msvcp90.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\envy\Desktop\moviedirbrowser\MDB-0.8a-win32-3\dist\python27.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\envy\Desktop\moviedirbrowser\MDB-0.8a-win32-3\dist\w9xpopen.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -52,24 +51,24 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 
 
 [Registry]
-Root: "HKCR"; Subkey: "*"; Flags: createvalueifdoesntexist
-Root: "HKCR"; Subkey: "*\shell"; Flags: createvalueifdoesntexist
-Root: "HKCR"; Subkey: "*\shell\MDB"; Flags: uninsdeletekey
-Root: "HKCR"; Subkey: "*\shell\MDB\command"; ValueType: string; ValueData: "{app}\gui.exe ""%1"""
+Root: "HKCR"; Subkey: "*"; Flags: createvalueifdoesntexist; Tasks: rtshortcuts
+Root: "HKCR"; Subkey: "*\shell"; Flags: createvalueifdoesntexist; Tasks: rtshortcuts
+Root: "HKCR"; Subkey: "*\shell\MDB"; Flags: uninsdeletekey; Tasks: rtshortcuts
+Root: "HKCR"; Subkey: "*\shell\MDB\command"; ValueType: string; ValueData: "{app}\MDB.exe ""%1"""; Tasks: rtshortcuts
 
-Root: "HKCR"; Subkey: "Directory"; Flags: createvalueifdoesntexist
-Root: "HKCR"; Subkey: "Directory\Background"; Flags: createvalueifdoesntexist
-Root: "HKCR"; Subkey: "Directory\Background\shell"; Flags: createvalueifdoesntexist
-Root: "HKCR"; Subkey: "Directory\Background\shell\MDB"; Flags: uninsdeletekey
-Root: "HKCR"; Subkey: "Directory\Background\shell\MDB\command"; ValueType: string; ValueData: "{app}\gui.exe"
+Root: "HKCR"; Subkey: "Directory"; Flags: createvalueifdoesntexist; Tasks: rtshortcuts
+Root: "HKCR"; Subkey: "Directory\Background"; Flags: createvalueifdoesntexist; Tasks: rtshortcuts
+Root: "HKCR"; Subkey: "Directory\Background\shell"; Flags: createvalueifdoesntexist; Tasks: rtshortcuts
+Root: "HKCR"; Subkey: "Directory\Background\shell\MDB"; Flags: uninsdeletekey; Tasks: rtshortcuts
+Root: "HKCR"; Subkey: "Directory\Background\shell\MDB\command"; ValueType: string; ValueData: "{app}\MDB.exe"; Tasks: rtshortcuts
 
-Root: "HKCR"; Subkey: "Directory"; Flags: createvalueifdoesntexist
-Root: "HKCR"; Subkey: "Directory\shell"; Flags: createvalueifdoesntexist
-Root: "HKCR"; Subkey: "Directory\shell\MDB"; Flags: uninsdeletekey
-Root: "HKCR"; Subkey: "Directory\shell\MDB\command"; ValueType: string; ValueData: "{app}\gui.exe ""%1"""
+Root: "HKCR"; Subkey: "Directory"; Flags: createvalueifdoesntexist; Tasks: rtshortcuts
+Root: "HKCR"; Subkey: "Directory\shell"; Flags: createvalueifdoesntexist; Tasks: rtshortcuts
+Root: "HKCR"; Subkey: "Directory\shell\MDB"; Flags: uninsdeletekey; Tasks: rtshortcuts
+Root: "HKCR"; Subkey: "Directory\shell\MDB\command"; ValueType: string; ValueData: "{app}\MDB.exe ""%1"""; Tasks: rtshortcuts
 
-Root: "HKCR"; Subkey: "LibraryFolder"; Flags: createvalueifdoesntexist
-Root: "HKCR"; Subkey: "LibraryFolder\Background"; Flags: createvalueifdoesntexist
-Root: "HKCR"; Subkey: "LibraryFolder\Background\shell"; Flags: createvalueifdoesntexist
-Root: "HKCR"; Subkey: "LibraryFolder\Background\shell\MDB"; Flags: uninsdeletekey
-Root: "HKCR"; Subkey: "LibraryFolder\Background\shell\MDB\command"; ValueType: string; ValueData: "{app}\gui.exe"
+Root: "HKCR"; Subkey: "LibraryFolder"; Flags: createvalueifdoesntexist; Tasks: rtshortcuts
+Root: "HKCR"; Subkey: "LibraryFolder\Background"; Flags: createvalueifdoesntexist; Tasks: rtshortcuts
+Root: "HKCR"; Subkey: "LibraryFolder\Background\shell"; Flags: createvalueifdoesntexist; Tasks: rtshortcuts
+Root: "HKCR"; Subkey: "LibraryFolder\Background\shell\MDB"; Flags: uninsdeletekey; Tasks: rtshortcuts
+Root: "HKCR"; Subkey: "LibraryFolder\Background\shell\MDB\command"; ValueType: string; ValueData: "{app}\MDB.exe"; Tasks: rtshortcuts
