@@ -1,16 +1,15 @@
 moviedirbrowser (mdb)
 ###############
 
-Todo (* means high priority)
+Todo (* means high priority, $ means trivial)
 ----
-- Proxy support
-- Add multiple files rtclick support for windows
+-$Proxy support
+-$Add multiple files rtclick support for windows
 - window resize
-- easier install methods
 - search for actor/director/genre/title
 - remove all error dialogs
 - better file match heuristics
-- folder rt-click should recurse
+-$folder rt-click should recurse
 - link to imdb site
 - Use opensubs database in addition to file name
 - Option to download subs
@@ -18,8 +17,13 @@ Todo (* means high priority)
 - Get an icon for the app
 - Put win/lin icons on site
 - About dialog
+- RottenTomatoes data
+- Check for updates feature in app
+- Disqus/feedback form/fb like/g+/stumble/mailing list on site
+- use jekyll etc for site
 
 
+- easier install methods[DONE]
 - Windows support[DONE]
 - Release on github pages[DONE]
 - Give out for betas[DONE]
