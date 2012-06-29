@@ -31,13 +31,12 @@ setup_options = {
         }
 
 win_options = {
-        'windows' : [{'script':'MDB/gui.py'}],
-        'console' : [{'script':'tools/reg-gen.py'}],
+        'windows' : [{'script':'bin/MDB'}],
         'options' : {'py2exe': {'bundle_files': 2}},
         }
 
 lin_options = {
-        'scripts' : ['setup/linux/MDB'],
+        'scripts' : ['bin/MDB'],
         }
 
 lin_nautilus_script_out = os.path.expanduser('~/.gnome2/nautilus-scripts/MDB')
