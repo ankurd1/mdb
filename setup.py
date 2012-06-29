@@ -83,8 +83,8 @@ if __name__ == '__main__':
         setup(**setup_options)
 
         if (action == 'install'):
-            if (is_yes("Do you want to install right-click shortcuts for\
-                    nautilus/gnome? (y/n)")):
+            if (is_yes("Do you want to install right-click shortcuts for " +\
+                    "nautilus/gnome? (y/n)")):
                 # copy nautilus-shortcuts.py to nautilus scripts
                 shutil.copy(lin_nautilus_script_in, lin_nautilus_script_out)
                 os.chmod(lin_nautilus_script_out, 0777)
