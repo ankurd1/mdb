@@ -7,3 +7,5 @@ Todo (* means high priority, $ means trivial)
 - Put win/lin icons on site
 - Disqus/feedback form/fb like/g+/stumble/mailing list on site
 - use jekyll etc for site
+- multiple copies of same movie should be ignored in the same listing
+    - this would solve cd1/cd2 stuff and tv series stuff

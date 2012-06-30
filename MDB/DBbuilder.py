@@ -74,12 +74,10 @@ def get_movie_name(filename):
     # 3. Split by some token, try to remove the last words and do a
     # search #NOT_IMPLEMENTED
     reject_words = ['dvd', 'xvid', 'brrip', 'r5', 'unrated', '720p', 'x264',
-                    'klaxxon', 'axxo', 'sample', 'br_300', '300mb']
+                    'klaxxon', 'axxo', 'sample', 'br_300', '300mb', 'cd1', 'cd2']
     reject_words_strict = ['eng', 'scr', 'dual']  # UNUSED
     #prepare: remove ext, make lower
-    if (filename[-4] == '.'):
-        filename = filename[:-4]
-
+    filename = ".".join(filename.split('.')[:-1])
     filename = filename.lower()
 
     #1
