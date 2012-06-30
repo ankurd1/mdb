@@ -10,6 +10,8 @@ from DBbuilder import out_dir, db_name, images_folder, create_database,\
 import os
 from textwrap import wrap
 import wx_signal
+import shutil
+import wx.html
 
 
 #CONSTANTS#
@@ -52,7 +54,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         lst.InsertColumn(4, "Runtime")
         lst.InsertColumn(5, "Details")
 
-        lst.SetColumnWidth(0, 150)
+        lst.SetColumnWidth(0, 100)
         lst.SetColumnWidth(1, 50)
         lst.SetColumnWidth(2, 50)
         lst.SetColumnWidth(3, 100)
@@ -149,37 +151,25 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         return res[0]
 
     def build_info_panel(self, data):
-        panel_3 = wx.Panel(self.lst, -1)
+        html_win = wx.html.HtmlWindow(self.lst, size=(-1, 180))
+                #style=wx.html.HW_SCROLLBAR_NEVER)
+
+        html_text ="<table><tr>"
         img_file = os.path.join(self.mdb_dir, images_folder,
                 data['filename'] + '.jpg')
         if os.path.exists(img_file):
-            bmp = wx.Bitmap(img_file)
-            bitmap_1 = wx.StaticBitmap(panel_3, -1, bmp)
+            html_text += '<td width="100"><img src="{0}"></td>\n'.format(img_file)
         else:
-            bitmap_1 = (100, 100)
+            html_text += '<td width="100"></td>'
 
-        label_1 = wx.StaticText(panel_3, -1, self.generate_label_text(data))
-        font = wx.Font(11, wx.MODERN, wx.NORMAL, wx.NORMAL)
-        label_1.SetFont(font)
+        html_text += "<td>" + self.generate_label_text(data) + "</td>"
+        html_text += "</tr></table>"
+        
+        html_win.SetPage(html_text)
 
-        self.label_1 = label_1
-
-        sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_3 = wx.BoxSizer(wx.VERTICAL)
-        sizer_2.Add(bitmap_1, 1, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
-        sizer_3.Add(label_1, 0, 0, 0)
-        sizer_2.Add(sizer_3, 4, wx.ALIGN_CENTER_VERTICAL, 0)
-        panel_3.SetSizer(sizer_2)
-
-        return panel_3
+        return html_win
 
     def generate_label_text(self, data):
-        heading_width = 10
-        pix_per_char = 13   # very approx value
-        total_width = int((self.display_width - 500) / pix_per_char)
-        print total_width
-        sep = ':  '
-
         data2 = [('Title', unicode(data['title'])),
                 ('Filename', unicode(data['filename'])),
                 ('Director', unicode(data['director'])),
@@ -187,18 +177,13 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
                 ('Plot', unicode(data['plot'])),
                 ]
 
-        res = ""
+        res = u"<table cellspacing=0 cellpadding=2>"
         for item in data2:
-            item_1_lines = wrap(item[1],
-                    total_width - heading_width - len(sep))
-            line1 = u"{0:<{w1}}{2}{1:<{w2}}\n".format(item[0], item_1_lines[0],
-                    sep, w1=heading_width, w2=total_width - heading_width - 3)
-            res += line1
+            res += u'<tr valign="top"><td valign="top"><b>{0}</b></td>\
+                    <td valign="top">{1}</td></tr>\n'.\
+                    format(item[0], item[1])
 
-            for line in item_1_lines[1:]:
-                out = (' ' * (heading_width + len(sep))) + line + '\n'
-                res += out
-
+        res += u"</table>"
         #print ''
         #print res
         return res

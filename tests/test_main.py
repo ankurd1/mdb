@@ -1,13 +1,15 @@
 #!/usr/bin/python
 
-import DBbuilder
-import wx
+import sys
 import os
+sys.path.append(os.path.abspath(".."))
+import MDB.DBbuilder as DBbuilder
+import wx
 import shutil
-import wx_signal
-from gui import MyFrame
-from gui import check_and_setup
-from DBbuilder import images_folder
+import MDB.wx_signal as wx_signal
+from MDB.gui import MyFrame
+from MDB.gui import check_and_setup
+from MDB.DBbuilder import images_folder
 
 
 #DATA#

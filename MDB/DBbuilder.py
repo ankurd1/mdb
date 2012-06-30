@@ -18,6 +18,7 @@ except ImportError, e:
 
 #CONSTANTS#
 api_url = 'http://www.imdbapi.com/?t='
+api_extra_opts = '' #'&plot=full'
 out_dir = '.mdb'
 db_name = 'mdbdata.sqlite'
 images_folder = 'images'
@@ -100,7 +101,8 @@ def get_movie_name(filename):
 
 def get_imdb_data(moviename):
     try:
-        res = json.load(urllib2.urlopen(api_url + urllib2.quote(moviename)))
+        res = json.load(urllib2.urlopen(api_url + urllib2.quote(moviename) +
+            api_extra_opts))
     except urllib2.URLError, e:
         return None
 
