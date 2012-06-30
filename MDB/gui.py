@@ -28,6 +28,8 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
         self.Bind(wx_signal.EVT_FILE_DONE, self.on_file_done)
         self.add_menu()
+        self.add_sb()
+        self.total_rows = 0
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self.sizer)
@@ -39,6 +41,12 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         ColumnSorterMixin.__init__(self, 6)
         self.sizer.Add(self.lst, 1, wx.EXPAND)
         self.Layout()
+
+    def add_sb(self):
+        sb = wx.StatusBar(self)
+        self.sb = sb
+        sb.SetStatusText("0 Files")
+        self.SetStatusBar(sb)
 
     def build_list(self):
         lst = ULC.UltimateListCtrl(
@@ -107,6 +115,8 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         self.Refresh()
 
         # switch to this dir
+        self.total_rows = 0
+        self.update_sb()
         os.chdir(target_dir)
 
         files_with_data, files_wo_data = process_dir('.', self.conn, self.cur)
@@ -144,6 +154,14 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         self.lst.SetStringItem(index, 4, unicode(data["runtime"]))
         self.lst.SetItemWindow(index, 5, self.build_info_panel(data),
                 expand=True)
+        self.total_rows += 1
+        self.update_sb()
+
+    def update_sb(self):
+        if (self.total_rows == 1):
+            self.sb.SetStatusText("1 File")
+        else:
+            self.sb.SetStatusText("{0} Files".format(self.total_rows))
 
     def get_from_db(self, filename):
         res = self.cur.execute('SELECT * FROM movies WHERE filename=?',
