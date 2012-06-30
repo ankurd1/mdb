@@ -316,6 +316,7 @@ def main():
         start_dbbuilder(frame, files_wo_data, mdb_dir)
 
     frame.Show()
+    frame.Layout()
     app.MainLoop()
 
 if __name__ == '__main__':
