@@ -211,8 +211,8 @@ def process_dir(directory, conn, cur):
     files_wo_data = []
 
     for fil in os.listdir(directory):
-        if os.path.isdir(fil):
-            fil_children = os.listdir(fil)
+        if os.path.isdir(os.path.join(directory, fil)):
+            fil_children = os.listdir(os.path.join(directory, fil))
             for c in fil_children:
                 if is_movie_file(c):
                     if is_in_db(conn, cur, c):
@@ -265,19 +265,16 @@ def main():
         files_with_data = []
         files_wo_data = []
 
+        #target_files should be in cwd
         #make all target_files non_absolute
         for i in range(len(target_files)):
             target_files[i] = os.path.basename(target_files[i])
 
         for fil in target_files:
             if os.path.isdir(fil):
-                fil_children = os.listdir(fil)
-                for c in fil_children:
-                    if is_movie_file(c):
-                        if is_in_db(conn, cur, c):
-                            files_with_data.append(c)
-                        else:
-                            files_wo_data.append(c)
+                f_with, f_wo = process_dir(fil, conn, cur)
+                files_with_data.extend(f_with)
+                files_wo_data.extend(f_wo)
             else:
                 if is_movie_file(fil):
                     if is_in_db(conn, cur, fil):
