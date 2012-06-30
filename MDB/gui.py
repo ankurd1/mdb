@@ -187,9 +187,15 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
         return html_win
 
+    def make_wrappable(self, txt):
+        wrap_points = ['.', '-', ']', ')']
+        for point in wrap_points:
+            txt = txt.replace(point, point + ' ')
+        return txt
+
     def generate_label_text(self, data):
         data2 = [('Title', unicode(data['title'])),
-                ('Filename', unicode(data['filename'])),
+                ('Filename', self.make_wrappable(unicode(data['filename']))),
                 ('Director', unicode(data['director'])),
                 ('Actors', unicode(data['actors'])),
                 ('Plot', unicode(data['plot'])),
