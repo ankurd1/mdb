@@ -6,16 +6,12 @@ import wx.lib.agw.ultimatelistctrl as ULC
 from wx.lib.mixins.listctrl import ColumnSorterMixin
 import sqlite3
 from DBbuilder import out_dir, db_name, images_folder, create_database,\
-        is_in_db, DBbuilderThread
+        is_in_db, DBbuilderThread, movie_formats
 import os
 from textwrap import wrap
 import wx_signal
 import shutil
 import wx.html
-
-
-#CONSTANTS#
-movie_formats = ['avi', 'mkv', 'mp4']
 
 
 #CLASSES#

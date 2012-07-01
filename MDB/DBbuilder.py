@@ -22,7 +22,7 @@ api_extra_opts = '' #'&plot=full'
 out_dir = '.mdb'
 db_name = 'mdbdata.sqlite'
 images_folder = 'images'
-movie_formats = ['avi', 'mkv', 'mp4']
+movie_formats = ['avi', 'mkv', 'mp4', 'm4v', 'rmvb']
 #http_proxy = 'proxy22.iitd.ac.in:3128'
 #https_proxy = 'proxy22.iitd.ac.in:3128'
 http_proxy = None
@@ -68,36 +68,53 @@ def add_to_db(filename, file_data, conn, cur):
 
 
 def get_movie_name(filename):
-    # 1. Find a year, reject everything after it, clean up
-    # 2. Find a reject word(like Dvd, brrip, xvid), reject everything
-    # after it, clean up
-    # 3. Split by some token, try to remove the last words and do a
-    # search #NOT_IMPLEMENTED
+    # TODO if filename doesnt get any results on imdb, maybe we can use the
+    # folder name
+    old_filename = filename
+
+    # make sure reject words dont have a char which is special in regexes, or
+    # else it shud be properly escaped
+    # Remove everything after a reject word
     reject_words = ['dvd', 'xvid', 'brrip', 'r5', 'unrated', '720p', 'x264',
-                    'klaxxon', 'axxo', 'sample', 'br_300', '300mb', 'cd1', 'cd2']
+                    'klaxxon', 'axxo', 'br_300', '300mb', 'cd1', 'cd2']
     reject_words_strict = ['eng', 'scr', 'dual']  # UNUSED
+
+    # dont process this file if a panic word is found
+    panic_words = ['sample']
+
     #prepare: remove ext, make lower
     filename = ".".join(filename.split('.')[:-1])
     filename = filename.lower()
 
-    #1
-    year_split = re.split('\d\d\d\d', filename)
-    if (len(year_split) > 1):
-        filename = year_split[0]
-
-    #2
-    for word in reject_words:
+    #0 panic words
+    for word in panic_words:
         if (filename.find(word) != -1):
-            filename = filename[:filename.find(word)]
+            return ''
+
+    #1 remove everythin in brackets
+    brackets = [('\(','\)'), ('\[', '\]'), ('\{', '\}')]
+    for b in brackets:
+        filename = re.sub(b[0] + '.*?' + b[1], ' ', filename)
+
+    #2 remove year and stuff following it
+    filename = re.sub('\d\d\d\d.*', ' ', filename)
+
+    #3 reject_words
+    for word in reject_words:
+        filename = re.sub(word + '.*', ' ', filename)
 
     #cleanup
     filename = re.sub('\s+', ' ', re.sub(
-        '[\._\-\[\(\]\)]', ' ', filename).strip())
+        '[\._\-\(\)\[\]\{\}]', ' ', filename).strip())
 
+    print old_filename, filename
     return filename
 
 
 def get_imdb_data(moviename):
+    if (moviename == ' ' or moviename == ''):
+        return None
+
     try:
         res = json.load(urllib2.urlopen(api_url + urllib2.quote(moviename) +
             api_extra_opts))
