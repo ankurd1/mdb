@@ -66,7 +66,16 @@ if __name__ == '__main__':
 
         setup_options.update(win_options)
         setup(**setup_options)
-        # TODO create the installer
+
+        # py2exe ignores package_data, lets fix that
+        # FIXME, this is hacky
+        # copy all dirs from each package which are not modules
+        print 'Copying package data...'
+        for item in setup_options['packages']:
+            for f in os.listdir(item):
+                if (os.path.isdir(item+'\\'+f)):
+                    shutil.copytree(item+'\\'+f, 'dist\\'+f)
+
         if (is_yes("Do you want to build the installer? (y/n)")):
             iss_file = 'setup/windows/MDB.iss'
             call(['Compil32.exe', '/cc', iss_file])
