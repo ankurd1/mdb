@@ -14,6 +14,7 @@ import shutil
 import wx.html
 from html_window import ClickableHtmlWindow
 from lib import module_path
+from dialogs import AboutDialog
 
 #RESOURCES#
 imdb_icon = os.path.join(module_path(), 'resources/images/imdb-logo.png')
@@ -75,7 +76,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         menuBar = wx.MenuBar()
         menu = wx.Menu()
 
-        m_open = menu.Append(wx.ID_ANY, "&Open Folder\tCtrl+O",
+        m_open = menu.Append(wx.ID_OPEN, "&Open Folder\tCtrl+O",
                              "Open a folder.")
         self.Bind(wx.EVT_MENU, self.open_folder, m_open)
 
@@ -128,7 +129,9 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
             start_dbbuilder(self, files_wo_data, self.mdb_dir)
 
     def on_about(self, evt):
-        print 'on_about not implemented yet'
+        abt_dlg = AboutDialog(self)
+        abt_dlg.ShowModal()
+        abt_dlg.Destroy()
 
     def GetListCtrl(self):
         return self.lst

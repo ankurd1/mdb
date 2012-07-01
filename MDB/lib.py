@@ -3,6 +3,8 @@
 import sys
 import os
 
+VERSION = '0.1'
+
 def get_platform():
     if sys.platform.startswith('win'):
         return 'windows'

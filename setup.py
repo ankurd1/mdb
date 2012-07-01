@@ -7,7 +7,7 @@ import os
 import glob
 import shutil
 from subprocess import call
-from MDB.lib import get_platform
+from MDB.lib import get_platform, VERSION
 
 
 def is_yes(quest):
@@ -21,7 +21,7 @@ def is_yes(quest):
 
 setup_options = {
         'name' : 'MDB',
-        'version' : '0.8a',
+        'version' : VERSION,
         'description' : 'Browse imdb data for a folder full of movies!',
         'author' : 'Ankur Dahiya',
         'author_email' : 'legalos.lotr@gmail.com',
