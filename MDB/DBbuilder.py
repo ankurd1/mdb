@@ -9,6 +9,7 @@ import wx_signal
 import wx
 import re
 import threading
+from lib import debug_status
 
 try:
     import simplejson as json
@@ -32,12 +33,13 @@ img_size = '100'
 
 #HELPER FUNCTIONS#
 def zenity_error(msg):
-    try:
-        call(['zenity', '--error', '--text', msg])
-    except OSError, e:
-        # zenity not available
-        # print to stderr
-        sys.stderr.write(msg + '\n')
+    sys.stderr.write(msg + '\n')
+    if (debug_status()):
+        try:
+            call(['zenity', '--error', '--text', msg])
+        except OSError, e:
+            pass
+            # zenity not available
 
 
 def create_database(conn, cur):
@@ -60,6 +62,9 @@ def create_database(conn, cur):
 
 
 def add_to_db(filename, file_data, conn, cur):
+    if (is_in_db(conn, cur, filename)):
+        return
+
     cur.execute('INSERT INTO movies VALUES(?,?,?,?,?,?,?,?,?,?,?,?)', (
         filename, file_data['Title'], file_data['Year'],
         file_data['Released'], file_data['Genre'], file_data['imdbRating'],
@@ -147,6 +152,7 @@ class DBbuilderThread(threading.Thread):
         self.parent = parent
         self.files = files
         self.mdb_dir = mdb_dir
+        self.exit_now = False
 
     def run(self):
         """Overrides Thread.run. Don't call this directly its called internally
@@ -196,6 +202,8 @@ class DBbuilderThread(threading.Thread):
 
         try:
             for filename in self.files:
+                if (self.exit_now):
+                    return
                 self.process_file(filename, conn, cur)
         except Exception, e:
             zenity_error(str(e))

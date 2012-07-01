@@ -13,7 +13,7 @@ import wx_signal
 import shutil
 import wx.html
 from html_window import ClickableHtmlWindow
-from lib import module_path
+from lib import module_path, debug_status, get_platform
 from dialogs import AboutDialog
 
 #RESOURCES#
@@ -26,8 +26,10 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         self.conn = conn
         self.cur = cur
         self.mdb_dir = mdb_dir
+        self.db_thread = None
 
         self.Bind(wx_signal.EVT_FILE_DONE, self.on_file_done)
+        self.Bind(wx.EVT_CLOSE, self.on_close)
         self.add_menu()
         self.add_sb()
         self.total_rows = 0
@@ -42,6 +44,12 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         ColumnSorterMixin.__init__(self, 6)
         self.sizer.Add(self.lst, 1, wx.EXPAND)
         self.Layout()
+
+    def on_close(self, evt):
+        if (self.db_thread is not None):
+            self.db_thread.exit_now = True
+            self.db_thread.join()
+        evt.Skip(True)
 
     def add_sb(self):
         sb = wx.StatusBar(self)
@@ -235,8 +243,12 @@ def is_movie_file(filename):
 
 
 def start_dbbuilder(frame, files_wo_data, mdb_dir):
-    db_thread = DBbuilderThread(frame, files_wo_data, mdb_dir)
-    db_thread.start()
+    if (frame.db_thread is not None):
+        frame.db_thread.exit_now = True
+        frame.db_thread.join()
+
+    frame.db_thread = DBbuilderThread(frame, files_wo_data, mdb_dir)
+    frame.db_thread.start()
 
 
 def process_dir(directory, conn, cur):
@@ -318,7 +330,14 @@ def main():
     print 'files_wo_data', files_wo_data
 
     #spawn threads
-    app = wx.App(redirect=False)
+    if (get_platform() == 'windows' and debug_status()):
+        app = wx.App(redirect=True)
+    else:
+        app = wx.App(redirect=False)
+
+    if (not debug_status()):
+        wx.Log_SetActiveTarget(wx.LogStderr()) 
+
     frame = MyFrame(None, conn, cur, mdb_dir)
     app.SetTopWindow(frame)
     frame.Maximize()

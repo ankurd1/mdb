@@ -22,3 +22,9 @@ def module_path():
     if we_are_frozen():
         return os.path.dirname(unicode(sys.executable, encoding))
     return os.path.dirname(unicode(__file__, encoding))
+
+def debug_status():
+    if ('MDB_DEBUG' in os.environ and os.environ['MDB_DEBUG'] == 'True'):
+        return True
+    else:
+        return False
