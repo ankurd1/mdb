@@ -7,15 +7,8 @@ import os
 import glob
 import shutil
 from subprocess import call
+from MDB.lib import get_platform
 
-
-def get_platform():
-    if sys.platform.startswith('win'):
-        return 'windows'
-    elif sys.platform.startswith('linux'):
-        return 'linux'
-    else:
-        return None
 
 def is_yes(quest):
     print quest
@@ -34,6 +27,7 @@ setup_options = {
         'author_email' : 'legalos.lotr@gmail.com',
         'packages' : ['MDB'],
         'url' : 'http://legaloslotr.github.com/mdb',
+        'package_data' : {'MDB' : ['resources/images/*']}
         }
 
 win_options = {

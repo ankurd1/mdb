@@ -12,7 +12,11 @@ from textwrap import wrap
 import wx_signal
 import shutil
 import wx.html
+from html_window import ClickableHtmlWindow
+from lib import module_path
 
+#RESOURCES#
+imdb_icon = os.path.join(module_path(), 'resources/images/imdb-logo.png')
 
 #CLASSES#
 class MyFrame(wx.Frame, ColumnSorterMixin):
@@ -165,19 +169,25 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         return res[0]
 
     def build_info_panel(self, data):
-        html_win = wx.html.HtmlWindow(self.lst, size=(-1, 180))
+        html_win = ClickableHtmlWindow(self.lst, size=(-1, 180))
                 #style=wx.html.HW_SCROLLBAR_NEVER)
 
-        html_text ="<table><tr>"
+        html_text = "<table><tr>"
         img_file = os.path.join(self.mdb_dir, images_folder,
                 data['filename'] + '.jpg')
         if os.path.exists(img_file):
-            html_text += '<td width="100"><img src="{0}"></td>\n'.format(img_file)
+            html_text += '<td width="100" rowspan="2">\
+                    <img src="{0}"></td>\n'.format(img_file)
         else:
-            html_text += '<td width="100"></td>'
+            html_text += '<td width="100" rowspan="2"></td>'
 
-        html_text += "<td>" + self.generate_label_text(data) + "</td>"
-        html_text += "</tr></table>"
+        # imdb icon
+        html_text += '<td><a href="http://imdb.com/title/{0}">\
+                <img src="{1}"></a></td></tr>'.format(data['imdbID'], imdb_icon)
+
+        # details
+        html_text += "<tr><td>" + self.generate_label_text(data) + "</td></tr>"
+        html_text += "</table>"
         
         html_win.SetPage(html_text)
 
@@ -267,7 +277,6 @@ def check_and_setup():
         create_database(conn, cur)
 
     return conn, cur, mdb_dir
-
 
 #MAIN#
 def main():

@@ -1,5 +1,5 @@
 include setup.py README.md
-include MDB/*
 include bin/*
 recursive-include setup/* *
+recursive-include MDB/* *
 include tests/*

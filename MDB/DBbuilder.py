@@ -52,18 +52,19 @@ def create_database(conn, cur):
             director TEXT,
             actors TEXT,
             plot TEXT,
-            poster TEXT
+            poster TEXT,
+            imdbID TEXT
             )''')
     cur.execute('CREATE UNIQUE INDEX filename_index ON movies (filename)')
     conn.commit()
 
 
 def add_to_db(filename, file_data, conn, cur):
-    cur.execute('INSERT INTO movies VALUES(?,?,?,?,?,?,?,?,?,?,?)', (
+    cur.execute('INSERT INTO movies VALUES(?,?,?,?,?,?,?,?,?,?,?,?)', (
         filename, file_data['Title'], file_data['Year'],
         file_data['Released'], file_data['Genre'], file_data['imdbRating'],
         file_data['Runtime'], file_data['Director'], file_data['Actors'],
-        file_data['Plot'], file_data['Poster']))
+        file_data['Plot'], file_data['Poster'], file_data['imdbID']))
     conn.commit()
 
 
