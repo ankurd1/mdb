@@ -49,7 +49,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         if (self.db_thread is not None):
             self.db_thread.exit_now = True
             self.db_thread.join()
-        evt.Skip(True)
+        self.Destroy()
 
     def add_sb(self):
         sb = wx.StatusBar(self)
@@ -84,9 +84,12 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         menuBar = wx.MenuBar()
         menu = wx.Menu()
 
-        m_open = menu.Append(wx.ID_OPEN, "&Open Folder\tCtrl+O",
+        m_open = menu.Append(wx.ID_OPEN, "&Open\tCtrl+O",
                              "Open a folder.")
         self.Bind(wx.EVT_MENU, self.open_folder, m_open)
+
+        m_exit = menu.Append(wx.ID_EXIT, "&Exit\tCtrl+Q", "Exit")
+        self.Bind(wx.EVT_MENU, self.on_close, m_exit)
 
         menuBar.Append(menu, "&File")
 
