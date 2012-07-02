@@ -44,15 +44,24 @@ defaults = {
         'debug': 'False'
 }
 
+prefs_item_map = [
+        ('debug', 'bool', 'Debug Mode'),
+        ('http_proxy', 'str', 'Http Proxy'),
+]
+
 config = ConfigObj(defaults)
 config.merge(ConfigObj(config_file_path))
-
-#handle proxy
-if (config['http_proxy'] != 'None'):
-    os.environ['http_proxy'] = config['http_proxy']
+config.filename = config_file_path
 
 #type conversion
-config['debug'] = bool(config['debug'])
+for item in prefs_item_map:
+    name = item[0]
+    typ = item[1]
+    if (typ == 'bool'):
+        if (config[name] == 'True'):
+            config[name] = True
+        else:
+            config[name] = False
 
 if (config['debug']):
     print config

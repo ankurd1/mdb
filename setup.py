@@ -7,7 +7,7 @@ import os
 import glob
 import shutil
 from subprocess import call
-from MDB.lib import get_platform, VERSION
+import MDB.config as config
 
 
 def is_yes(quest):
@@ -21,7 +21,7 @@ def is_yes(quest):
 
 setup_options = {
         'name' : 'MDB',
-        'version' : VERSION,
+        'version' : config.version,
         'description' : 'Browse imdb data for a folder full of movies!',
         'author' : 'Ankur Dahiya',
         'author_email' : 'legalos.lotr@gmail.com',
@@ -43,10 +43,9 @@ lin_nautilus_script_out = os.path.expanduser('~/.gnome2/nautilus-scripts/MDB')
 lin_nautilus_script_in = 'setup/linux/nautilus-script.py'
 
 if __name__ == '__main__':
-    platform = get_platform()
     action = sys.argv[1]
 
-    if (platform == 'windows' and action == 'py2exe'):
+    if (config.platform == 'windows' and action == 'py2exe'):
         import py2exe
 
         # setup dlls
@@ -80,7 +79,7 @@ if __name__ == '__main__':
             iss_file = 'setup/windows/MDB.iss'
             call(['Compil32.exe', '/cc', iss_file])
 
-    elif (platform == 'linux'):
+    elif (config.platform == 'linux'):
         # TODO Also install a .desktop file and an uninstaler.
         setup_options.update(lin_options)
         setup(**setup_options)

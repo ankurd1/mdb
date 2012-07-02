@@ -11,7 +11,7 @@ import wx_signal
 import shutil
 import wx.html
 from html_window import ClickableHtmlWindow
-from dialogs import AboutDialog
+from dialogs import AboutDialog, PrefsDialog
 import config
 
 
@@ -85,6 +85,9 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
                              "Open a folder.")
         self.Bind(wx.EVT_MENU, self.open_folder, m_open)
 
+        m_prefs = menu.Append(wx.ID_PREFERENCES, "&Preferences", "Preferences")
+        self.Bind(wx.EVT_MENU, self.on_prefs, m_prefs)
+
         m_exit = menu.Append(wx.ID_EXIT, "&Exit\tCtrl+Q", "Exit")
         self.Bind(wx.EVT_MENU, self.on_close, m_exit)
 
@@ -99,6 +102,12 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         menuBar.Append(menu, "&Help")
 
         self.SetMenuBar(menuBar)
+
+    def on_prefs(self, evt):
+        dlg = PrefsDialog(parent=self, items_map=config.prefs_item_map,
+                config_obj=config.config) 
+        dlg.ShowModal()
+        dlg.Destroy()
 
     def open_folder(self, evt):
         dlg = wx.DirDialog(self, "Choose a directory:",
