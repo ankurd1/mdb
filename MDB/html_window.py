@@ -16,3 +16,8 @@ class ClickableHtmlWindow(wx.html.HtmlWindow):
             except ImportError, e:
                 return
             startfile(linkinfo.GetHref())
+
+    def attach_to_frame(self, frame, sb_slot):
+        self.SetRelatedFrame(frame, "")
+        self.SetRelatedStatusBar(sb_slot)
+

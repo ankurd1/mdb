@@ -5,11 +5,14 @@ from html_window import ClickableHtmlWindow
 from lib import VERSION
 
 class AboutDialog(wx.Dialog):
-    def __init__(self, *args, **kwds):
-        wx.Dialog.__init__(self, *args, **kwds)
+    def __init__(self, parent, *args, **kwds):
+        wx.Dialog.__init__(self, parent, *args, **kwds)
         self.SetBackgroundColour((240, 240, 240))
+        
         self.html_panel = ClickableHtmlWindow(self)
         self.set_html_content(self.html_panel)
+        self.html_panel.attach_to_frame(parent, 0)
+  
         self.button_1 = wx.Button(self, -1, "Close")
         self.Bind(wx.EVT_BUTTON, self.on_close)
 
@@ -23,7 +26,7 @@ class AboutDialog(wx.Dialog):
     def __do_layout(self):
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
         sizer_1.Add(self.html_panel, 1, wx.EXPAND, 0)
-        sizer_1.Add(self.button_1, 0, wx.ALIGN_RIGHT, 0)
+        sizer_1.Add(self.button_1, 0, wx.ALIGN_CENTER, 0)
         self.SetSizer(sizer_1)
         self.Layout()
 

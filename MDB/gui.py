@@ -54,7 +54,9 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
     def add_sb(self):
         sb = wx.StatusBar(self)
         self.sb = sb
-        sb.SetStatusText("0 Files")
+        sb.SetFieldsCount(2)
+        sb.SetStatusWidths([-2, -1])
+        sb.SetStatusText("0 Files", 1)
         self.SetStatusBar(sb)
 
     def build_list(self):
@@ -173,9 +175,9 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
     def update_sb(self):
         if (self.total_rows == 1):
-            self.sb.SetStatusText("1 File")
+            self.sb.SetStatusText("1 File", 1)
         else:
-            self.sb.SetStatusText("{0} Files".format(self.total_rows))
+            self.sb.SetStatusText("{0} Files".format(self.total_rows), 1)
 
     def get_from_db(self, filename):
         res = self.cur.execute('SELECT * FROM movies WHERE filename=?',
@@ -184,6 +186,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
     def build_info_panel(self, data):
         html_win = ClickableHtmlWindow(self.lst, size=(-1, 180))
+        html_win.attach_to_frame(self, 0)
                 #style=wx.html.HW_SCROLLBAR_NEVER)
 
         html_text = "<table><tr>"
