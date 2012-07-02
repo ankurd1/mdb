@@ -5,27 +5,22 @@ import wx
 import wx.lib.agw.ultimatelistctrl as ULC
 from wx.lib.mixins.listctrl import ColumnSorterMixin
 import sqlite3
-from DBbuilder import out_dir, db_name, images_folder, create_database,\
-        is_in_db, DBbuilderThread, movie_formats
+from DBbuilder import create_database, is_in_db, DBbuilderThread
 import os
-from textwrap import wrap
 import wx_signal
 import shutil
 import wx.html
 from html_window import ClickableHtmlWindow
-from lib import module_path, debug_status, get_platform
 from dialogs import AboutDialog
+import config
 
-#RESOURCES#
-imdb_icon = os.path.join(module_path(), 'resources/images/imdb-logo.png')
 
 #CLASSES#
 class MyFrame(wx.Frame, ColumnSorterMixin):
-    def __init__(self, parent, conn, cur, mdb_dir):
+    def __init__(self, parent, conn, cur):
         wx.Frame.__init__(self, parent, -1, "MDB")
         self.conn = conn
         self.cur = cur
-        self.mdb_dir = mdb_dir
         self.db_thread = None
 
         self.Bind(wx_signal.EVT_FILE_DONE, self.on_file_done)
@@ -139,7 +134,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
             self.add_row(f)
 
         if len(files_wo_data) > 0:
-            start_dbbuilder(self, files_wo_data, self.mdb_dir)
+            start_dbbuilder(self, files_wo_data)
 
     def on_about(self, evt):
         abt_dlg = AboutDialog(self)
@@ -190,7 +185,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
                 #style=wx.html.HW_SCROLLBAR_NEVER)
 
         html_text = "<table><tr>"
-        img_file = os.path.join(self.mdb_dir, images_folder,
+        img_file = os.path.join(config.mdb_dir, config.images_folder,
                 data['filename'] + '.jpg')
         if os.path.exists(img_file):
             html_text += '<td width="100" rowspan="2">\
@@ -200,12 +195,13 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
         # imdb icon
         html_text += '<td><a href="http://imdb.com/title/{0}">\
-                <img src="{1}"></a></td></tr>'.format(data['imdbID'], imdb_icon)
+                <img src="{1}"></a></td></tr>'.format(data['imdbID'],
+                        config.imdb_icon)
 
         # details
         html_text += "<tr><td>" + self.generate_label_text(data) + "</td></tr>"
         html_text += "</table>"
-        
+
         html_win.SetPage(html_text)
 
         return html_win
@@ -242,18 +238,18 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
 #HELPER FUNCTIONS#
 def is_movie_file(filename):
-    if (filename[-3:] in movie_formats):
+    if (filename[-3:] in config.movie_formats):
         return True
     else:
         return False
 
 
-def start_dbbuilder(frame, files_wo_data, mdb_dir):
+def start_dbbuilder(frame, files_wo_data):
     if (frame.db_thread is not None):
         frame.db_thread.exit_now = True
         frame.db_thread.join()
 
-    frame.db_thread = DBbuilderThread(frame, files_wo_data, mdb_dir)
+    frame.db_thread = DBbuilderThread(frame, files_wo_data)
     frame.db_thread.start()
 
 
@@ -280,28 +276,29 @@ def process_dir(directory, conn, cur):
 
 
 def check_and_setup():
-    mdb_dir = os.path.join(os.path.expanduser('~'), out_dir)
-    if (os.path.exists(mdb_dir) and\
-            os.path.exists(os.path.join(mdb_dir, db_name)) and\
-            os.path.exists(os.path.join(mdb_dir, images_folder))):
-        conn = sqlite3.connect(os.path.join(mdb_dir, db_name))
+    if (os.path.exists(config.mdb_dir) and\
+            os.path.exists(os.path.join(config.mdb_dir, config.db_name)) and\
+            os.path.exists(os.path.join(config.mdb_dir,
+                config.images_folder))):
+        conn = sqlite3.connect(os.path.join(config.mdb_dir, config.db_name))
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
     else:
-        try: shutil.rmtree(mdb_dir)
+        try: shutil.rmtree(config.mdb_dir)
         except: pass
-        os.mkdir(mdb_dir)
-        os.mkdir(os.path.join(mdb_dir, images_folder))
-        conn = sqlite3.connect(os.path.join(mdb_dir, db_name))
+        os.mkdir(config.mdb_dir)
+        os.mkdir(os.path.join(config.mdb_dir, config.images_folder))
+        conn = sqlite3.connect(os.path.join(config.mdb_dir, config.db_name))
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
         create_database(conn, cur)
 
-    return conn, cur, mdb_dir
+    return conn, cur
+
 
 #MAIN#
 def main():
-    conn, cur, mdb_dir = check_and_setup()
+    conn, cur = check_and_setup()
     if len(sys.argv) == 1:
         # no args, use curdir
         target_files = None
@@ -336,15 +333,15 @@ def main():
     print 'files_wo_data', files_wo_data
 
     #spawn threads
-    if (get_platform() == 'windows' and debug_status()):
+    if (config.platform == 'windows' and config.config['debug']):
         app = wx.App(redirect=True)
     else:
         app = wx.App(redirect=False)
 
-    if (not debug_status()):
-        wx.Log_SetActiveTarget(wx.LogStderr()) 
+    if (not config.config['debug']):
+        wx.Log_SetActiveTarget(wx.LogStderr())
 
-    frame = MyFrame(None, conn, cur, mdb_dir)
+    frame = MyFrame(None, conn, cur)
     app.SetTopWindow(frame)
     frame.Maximize()
 
@@ -352,7 +349,7 @@ def main():
         frame.add_row(f)
 
     if len(files_wo_data) > 0:
-        start_dbbuilder(frame, files_wo_data, mdb_dir)
+        start_dbbuilder(frame, files_wo_data)
 
     frame.Show()
     frame.Layout()

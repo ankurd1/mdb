@@ -1,16 +1,16 @@
 import wx.html
-from lib import get_platform
 from subprocess import call
+import config
+
 
 class ClickableHtmlWindow(wx.html.HtmlWindow):
     def __init__(self, parent, *args, **kwargs):
         wx.html.HtmlWindow.__init__(self, parent, *args, **kwargs)
 
     def OnLinkClicked(self, linkinfo):
-        platform = get_platform()
-        if (platform == 'linux'):
+        if (config.platform == 'linux'):
             call(['xdg-open', linkinfo.GetHref()])
-        elif (platform == 'windows'):
+        elif (config.platform == 'windows'):
             try:
                 from os import startfile
             except ImportError, e:
@@ -20,4 +20,3 @@ class ClickableHtmlWindow(wx.html.HtmlWindow):
     def attach_to_frame(self, frame, sb_slot):
         self.SetRelatedFrame(frame, "")
         self.SetRelatedStatusBar(sb_slot)
-

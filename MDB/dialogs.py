@@ -2,17 +2,18 @@
 
 import wx
 from html_window import ClickableHtmlWindow
-from lib import VERSION
+import config
+
 
 class AboutDialog(wx.Dialog):
     def __init__(self, parent, *args, **kwds):
         wx.Dialog.__init__(self, parent, *args, **kwds)
         self.SetBackgroundColour((240, 240, 240))
-        
+
         self.html_panel = ClickableHtmlWindow(self)
         self.set_html_content(self.html_panel)
         self.html_panel.attach_to_frame(parent, 0)
-  
+
         self.button_1 = wx.Button(self, -1, "Close")
         self.Bind(wx.EVT_BUTTON, self.on_close)
 
@@ -40,7 +41,7 @@ class AboutDialog(wx.Dialog):
         http://legaloslotr.github.com/mdb</a><br>
         Data collected from <a href="http://imdb.com">IMDB</a>
         </center></body>
-        '''.format(VERSION)
+        '''.format(config.version)
         panel.SetPage(abt_dlg_content)
 
     def on_close(self, evt):

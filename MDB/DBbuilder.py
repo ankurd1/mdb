@@ -9,7 +9,7 @@ import wx_signal
 import wx
 import re
 import threading
-from lib import debug_status
+import config
 
 try:
     import simplejson as json
@@ -17,24 +17,10 @@ except ImportError, e:
     import json
 
 
-#CONSTANTS#
-api_url = 'http://www.imdbapi.com/?t='
-api_extra_opts = '' #'&plot=full'
-out_dir = '.mdb'
-db_name = 'mdbdata.sqlite'
-images_folder = 'images'
-movie_formats = ['avi', 'mkv', 'mp4', 'm4v', 'rmvb']
-#http_proxy = 'proxy22.iitd.ac.in:3128'
-#https_proxy = 'proxy22.iitd.ac.in:3128'
-http_proxy = None
-https_proxy = None
-img_size = '100'
-
-
 #HELPER FUNCTIONS#
 def zenity_error(msg):
     sys.stderr.write(msg + '\n')
-    if (debug_status()):
+    if (config.config['debug']):
         try:
             call(['zenity', '--error', '--text', msg])
         except OSError, e:
@@ -98,7 +84,7 @@ def get_movie_name(filename):
             return ''
 
     #1 remove everythin in brackets
-    brackets = [('\(','\)'), ('\[', '\]'), ('\{', '\}')]
+    brackets = [('\(', '\)'), ('\[', '\]'), ('\{', '\}')]
     for b in brackets:
         filename = re.sub(b[0] + '.*?' + b[1], ' ', filename)
 
@@ -122,8 +108,8 @@ def get_imdb_data(moviename):
         return None
 
     try:
-        res = json.load(urllib2.urlopen(api_url + urllib2.quote(moviename) +
-            api_extra_opts))
+        res = json.load(urllib2.urlopen(config.api_url +
+            urllib2.quote(moviename) + config.api_extra_opts))
     except urllib2.URLError, e:
         return None
 
@@ -147,11 +133,10 @@ def is_in_db(conn, cur, filename):
 
 #CLASSES#
 class DBbuilderThread(threading.Thread):
-    def __init__(self, parent, files, mdb_dir):
+    def __init__(self, parent, files):
         threading.Thread.__init__(self)
         self.parent = parent
         self.files = files
-        self.mdb_dir = mdb_dir
         self.exit_now = False
 
     def run(self):
@@ -181,8 +166,8 @@ class DBbuilderThread(threading.Thread):
             add_to_db(filename, file_data, conn, cur)
             if file_data['Poster'] is not None:
                 # save image
-                img_url = file_data['Poster'][:-7] + img_size + '.jpg'
-                img_file = os.path.join(self.mdb_dir, images_folder,
+                img_url = file_data['Poster'][:-7] + config.img_size + '.jpg'
+                img_file = os.path.join(config.mdb_dir, config.images_folder,
                                         filename + '.jpg')
                 img_fh = open(img_file, 'wb')
                 img_fh.write(urllib2.urlopen(img_url).read())
@@ -191,13 +176,7 @@ class DBbuilderThread(threading.Thread):
             print 'file processed'
 
     def process_files(self):
-        # set proxies
-        if (http_proxy is not None):
-            os.environ['http_proxy'] = http_proxy
-        if (https_proxy is not None):
-            os.environ['https_proxy'] = https_proxy
-
-        conn = sqlite3.connect(os.path.join(self.mdb_dir, db_name))
+        conn = sqlite3.connect(os.path.join(config.mdb_dir, config.db_name))
         cur = conn.cursor()
 
         try:
