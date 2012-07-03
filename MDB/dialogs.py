@@ -12,7 +12,8 @@ class HtmlDialog(wx.Dialog):
         self.SetBackgroundColour((240, 240, 240))
 
         self.html_panel = ClickableHtmlWindow(self)
-        self.html_panel.SetPage(content)
+        self.SetTitle(content['title'])
+        self.html_panel.SetPage(content['body'])
         self.html_panel.attach_to_frame(parent, 0)
 
         self.button_1 = wx.Button(self, -1, "Close")
@@ -22,7 +23,6 @@ class HtmlDialog(wx.Dialog):
         self.__do_layout()
 
     def __set_properties(self):
-        self.SetTitle("About MDB")
         self.SetSize((400, 180))
 
     def __do_layout(self):

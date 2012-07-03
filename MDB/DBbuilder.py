@@ -119,7 +119,7 @@ def get_imdb_data(moviename):
         return None, True
 
     if (response.json['Response'] == 'True'):
-        return response.json
+        return response.json, True
     else:
         return None, True
 
@@ -178,7 +178,8 @@ class DBbuilderThread(threading.Thread):
                 img_file = os.path.join(config.mdb_dir, config.images_folder,
                                         filename + '.jpg')
                 img_fh = open(img_file, 'wb')
-                img_fh.write(requests.get(img_url).content)
+                try: img_fh.write(requests.get(img_url).content)
+                except requests.RequestException, e: pass
                 img_fh.close()
             self.signal_gui(filename)
             print 'file processed'

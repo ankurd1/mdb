@@ -256,8 +256,13 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         self.add_row(evt.filename)
 
     def on_show_msg(self, evt):
-        wx.MessageBox(evt.content['body'], evt.content['title'],
-                style=wx.OK | wx.CENTER, parent=self)
+        if (evt.html):
+            dlg = HtmlDialog(self, content=evt.content)
+            dlg.ShowModal()
+            dlg.Destroy()
+        else:
+            wx.MessageBox(evt.content['body'], evt.content['title'],
+                    style=wx.OK | wx.CENTER, parent=self)
 
 
 #HELPER FUNCTIONS#

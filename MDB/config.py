@@ -68,21 +68,30 @@ platform = get_platform()
 
 update_url = 'http://legaloslotr.github.com/mdb/update.html'
 
-abt_dlg_content = '''
-<body bgcolor="#f1f1f1">
-<center>
-<h2>MDB - MovieDirBrowser</h2>
-v{0}<br>
-<a href="http://legaloslotr.github.com/mdb">
-http://legaloslotr.github.com/mdb</a><br>
-Data collected from <a href="http://imdb.com">IMDB</a>
-</center></body>
-'''.format(version)
+abt_dlg_content = {
+    'title': 'About',
+    'body': '''
+        <body bgcolor="#f1f1f1">
+        <center>
+        <h2>MDB - MovieDirBrowser</h2>
+        v{0}<br>
+        <a href="http://legaloslotr.github.com/mdb">
+        http://legaloslotr.github.com/mdb</a><br>
+        <a href="mailto:legalos.lotr@gmail.com">Ankur Dahiya</a><br>
+        Data collected from <a href="http://imdb.com">IMDB</a>
+        </center></body>
+        '''.format(version),
+}
 
 cant_connect_content = {
     'title': 'Connection Error',
     'body': "Unable to connect to the internet.\
             \nPlease check your internet connection.",
+}
+
+no_updates_content = {
+    'title': 'No updates',
+    'body': "No updates were found.",
 }
 
 #Configurable stuff
