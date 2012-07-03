@@ -25,6 +25,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         self.upd_thread = None
 
         self.Bind(wx_signal.EVT_FILE_DONE, self.on_file_done)
+        self.Bind(wx_signal.EVT_SHOW_MSG, self.on_show_msg)
         self.Bind(wx.EVT_CLOSE, self.on_close)
         self.add_menu()
         self.add_sb()
@@ -254,6 +255,10 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         print "event recieved containing", evt.filename
         self.add_row(evt.filename)
 
+    def on_show_msg(self, evt):
+        wx.MessageBox(evt.content['body'], evt.content['title'],
+                style=wx.OK | wx.CENTER, parent=self)
+
 
 #HELPER FUNCTIONS#
 def is_movie_file(filename):
@@ -305,7 +310,7 @@ def check_and_setup():
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-    if (os.path.exists(os.path.join(config.mdb_dir, config.db_name))):
+    if (not os.path.exists(os.path.join(config.mdb_dir, config.db_name))):
         create_database(conn, cur)
 
     return conn, cur

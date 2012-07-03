@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-import urllib2
 import os
 from subprocess import call
 import sys
@@ -10,11 +9,7 @@ import wx
 import re
 import threading
 import config
-
-try:
-    import simplejson as json
-except ImportError, e:
-    import json
+import requests
 
 
 #HELPER FUNCTIONS#
@@ -105,18 +100,28 @@ def get_movie_name(filename):
 
 def get_imdb_data(moviename):
     if (moviename == ' ' or moviename == ''):
-        return None
+        return None, True
+
+    params = {
+            config.api_movie_param: moviename,
+            }
+    params.update(config.api_extra_opts)
 
     try:
-        res = json.load(urllib2.urlopen(config.api_url +
-            urllib2.quote(moviename) + config.api_extra_opts))
-    except urllib2.URLError, e:
-        return None
+        response = requests.get(config.api_url, params=params)
+    except requests.RequestException, e:
+        print "DBbuilder: RequestException", e
+        return None, False
 
-    if (res['Response'] == 'True'):
-        return res
+    if (not response.ok):
+        # Should we stop further processing here?
+        print "Some error with the api!"
+        return None, True
+
+    if (response.json['Response'] == 'True'):
+        return response.json
     else:
-        return None
+        return None, True
 
 
 def is_in_db(conn, cur, filename):
@@ -152,10 +157,13 @@ class DBbuilderThread(threading.Thread):
         wx.PostEvent(self.parent, evt)
 
     def process_file(self, filename, conn, cur):
-        file_data = get_imdb_data(get_movie_name(filename))
+        file_data, process_further = get_imdb_data(get_movie_name(filename))
+        if (not process_further):
+            return False
+
         if (file_data is None):
             print "None data from imdb for", filename
-            return
+            return True
 
         for item in file_data:
             if file_data[item] == 'N/A':
@@ -170,10 +178,11 @@ class DBbuilderThread(threading.Thread):
                 img_file = os.path.join(config.mdb_dir, config.images_folder,
                                         filename + '.jpg')
                 img_fh = open(img_file, 'wb')
-                img_fh.write(urllib2.urlopen(img_url).read())
+                img_fh.write(requests.get(img_url).content)
                 img_fh.close()
             self.signal_gui(filename)
             print 'file processed'
+        return True
 
     def process_files(self):
         conn = sqlite3.connect(os.path.join(config.mdb_dir, config.db_name))
@@ -183,7 +192,12 @@ class DBbuilderThread(threading.Thread):
             for filename in self.files:
                 if (self.exit_now):
                     return
-                self.process_file(filename, conn, cur)
+                process_further = self.process_file(filename, conn, cur)
+                if (not process_further):
+                    evt = wx_signal.ShowMsgEvent(wx_signal.myEVT_SHOW_MSG, -1,
+                            config.cant_connect_content)
+                    wx.PostEvent(self.parent, evt)
+                    return
         except Exception, e:
             zenity_error(str(e))
             raise
