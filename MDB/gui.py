@@ -8,11 +8,11 @@ import sqlite3
 from DBbuilder import create_database, is_in_db, DBbuilderThread
 import os
 import wx_signal
-import shutil
 import wx.html
 from html_window import ClickableHtmlWindow
-from dialogs import AboutDialog, PrefsDialog
+from dialogs import HtmlDialog, PrefsDialog
 import config
+from update import UpdateThread
 
 
 #CLASSES#
@@ -22,6 +22,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         self.conn = conn
         self.cur = cur
         self.db_thread = None
+        self.upd_thread = None
 
         self.Bind(wx_signal.EVT_FILE_DONE, self.on_file_done)
         self.Bind(wx.EVT_CLOSE, self.on_close)
@@ -44,6 +45,9 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         if (self.db_thread is not None):
             self.db_thread.exit_now = True
             self.db_thread.join()
+        if (self.upd_thread is not None):
+            self.upd_thread.exit_now = True
+            self.upd_thread.join()
         self.Destroy()
 
     def add_sb(self):
@@ -99,13 +103,19 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
                               "Information about this program")
         self.Bind(wx.EVT_MENU, self.on_about, m_about)
 
+        m_upd = menu.Append(wx.ID_ANY, "&Check For Updates",
+                              "Check For Updates")
+        self.Bind(wx.EVT_MENU, self.on_chk_upd, m_upd)
+
         menuBar.Append(menu, "&Help")
 
         self.SetMenuBar(menuBar)
 
+    def on_chk_upd(self, evt):
+        check_for_updates(self, True)
+
     def on_prefs(self, evt):
-        dlg = PrefsDialog(parent=self, items_map=config.prefs_item_map,
-                config_obj=config.config) 
+        dlg = PrefsDialog(parent=self, items_map=config.prefs_item_map)
         dlg.ShowModal()
         dlg.Destroy()
 
@@ -146,7 +156,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
             start_dbbuilder(self, files_wo_data)
 
     def on_about(self, evt):
-        abt_dlg = AboutDialog(self)
+        abt_dlg = HtmlDialog(self, content=config.abt_dlg_content)
         abt_dlg.ShowModal()
         abt_dlg.Destroy()
 
@@ -285,24 +295,29 @@ def process_dir(directory, conn, cur):
 
 
 def check_and_setup():
-    if (os.path.exists(config.mdb_dir) and\
-            os.path.exists(os.path.join(config.mdb_dir, config.db_name)) and\
-            os.path.exists(os.path.join(config.mdb_dir,
-                config.images_folder))):
-        conn = sqlite3.connect(os.path.join(config.mdb_dir, config.db_name))
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-    else:
-        try: shutil.rmtree(config.mdb_dir)
-        except: pass
-        os.mkdir(config.mdb_dir)
-        os.mkdir(os.path.join(config.mdb_dir, config.images_folder))
-        conn = sqlite3.connect(os.path.join(config.mdb_dir, config.db_name))
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
+    try: os.mkdir(config.mdb_dir)
+    except OSError, e: pass
+
+    try: os.mkdir(os.path.join(config.mdb_dir, config.images_folder))
+    except OSError, e: pass
+
+    conn = sqlite3.connect(os.path.join(config.mdb_dir, config.db_name))
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    if (os.path.exists(os.path.join(config.mdb_dir, config.db_name))):
         create_database(conn, cur)
 
     return conn, cur
+
+
+def check_for_updates(frame, force=False):
+    if (frame.upd_thread is not None):
+        frame.upd_thread.exit_now = True
+        frame.upd_thread.join()
+
+    frame.upd_thread = UpdateThread(frame, force)
+    frame.upd_thread.start()
 
 
 #MAIN#
@@ -351,6 +366,9 @@ def main():
         wx.Log_SetActiveTarget(wx.LogStderr())
 
     frame = MyFrame(None, conn, cur)
+
+    check_for_updates(frame)
+
     app.SetTopWindow(frame)
     frame.Maximize()
 

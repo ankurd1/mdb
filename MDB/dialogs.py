@@ -3,17 +3,16 @@
 import wx
 from html_window import ClickableHtmlWindow
 import config
-from configobj import ConfigObj
 
 
-class AboutDialog(wx.Dialog):
-    def __init__(self, parent, *args, **kwds):
+class HtmlDialog(wx.Dialog):
+    def __init__(self, parent, content, *args, **kwds):
         kwds["style"] = wx.DEFAULT_DIALOG_STYLE
         wx.Dialog.__init__(self, parent, *args, **kwds)
         self.SetBackgroundColour((240, 240, 240))
 
         self.html_panel = ClickableHtmlWindow(self)
-        self.set_html_content(self.html_panel)
+        self.html_panel.SetPage(content)
         self.html_panel.attach_to_frame(parent, 0)
 
         self.button_1 = wx.Button(self, -1, "Close")
@@ -33,32 +32,18 @@ class AboutDialog(wx.Dialog):
         self.SetSizer(sizer_1)
         self.Layout()
 
-    def set_html_content(self, panel):
-        abt_dlg_content = '''
-        <body bgcolor="#f1f1f1">
-        <center>
-        <h2>MDB - MovieDirBrowser</h2>
-        v{0}<br>
-        <a href="http://legaloslotr.github.com/mdb">
-        http://legaloslotr.github.com/mdb</a><br>
-        Data collected from <a href="http://imdb.com">IMDB</a>
-        </center></body>
-        '''.format(config.version)
-        panel.SetPage(abt_dlg_content)
-
     def on_close(self, evt):
         self.Destroy()
 
 
 class PrefsDialog(wx.Dialog):
-    def __init__(self, items_map, config_obj, *args, **kwds):
+    def __init__(self, items_map, *args, **kwds):
         # begin wxGlade: MyDialog.__init__
         kwds["style"] = wx.DEFAULT_DIALOG_STYLE
         wx.Dialog.__init__(self, *args, **kwds)
 
         self.items_map = items_map
         self.controls_map = {}
-        self.config_obj = config_obj
 
         self.button_1 = wx.Button(self, -1, "OK")
         self.button_2 = wx.Button(self, -1, "Cancel")
@@ -95,10 +80,10 @@ class PrefsDialog(wx.Dialog):
     def on_ok(self, evt):
         for item in self.items_map:
             name = item[0]
-            self.config_obj[name] = self.controls_map[name].GetValue()
+            config.config[name] = self.controls_map[name].GetValue()
 
-        print self.config_obj
-        print self.config_obj.write()
+        config.config.write()
+        config.post_process()
         self.Destroy()
 
     def on_cancel(self, evt):
@@ -111,14 +96,14 @@ class PrefsDialog(wx.Dialog):
             label = item[2]
             if (typ == 'bool'):
                 checkbox = wx.CheckBox(self, -1, label)
-                checkbox.SetValue(self.config_obj[name])
+                checkbox.SetValue(config.config[name])
                 self.controls_map[name] = checkbox
                 self.sizer_4.Add(checkbox, 0, wx.ALL, 5)
             elif (typ == 'str'):
                 label_ctrl = wx.StaticText(self, -1, label)
                 text_ctrl = wx.TextCtrl(self, -1, "")
                 text_ctrl.SetMinSize((200, 27))
-                text_ctrl.SetValue(self.config_obj[name])
+                text_ctrl.SetValue(config.config[name])
 
                 self.controls_map[name] = text_ctrl
 

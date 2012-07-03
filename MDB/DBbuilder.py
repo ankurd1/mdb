@@ -104,11 +104,6 @@ def get_movie_name(filename):
 
 
 def get_imdb_data(moviename):
-    #handle proxy
-    if (config.config['http_proxy'] != 'None' and\
-            len(config.config['http_proxy']) > 0):
-        os.environ['http_proxy'] = config.config['http_proxy']
-
     if (moviename == ' ' or moviename == ''):
         return None
 
