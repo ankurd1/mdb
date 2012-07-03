@@ -103,7 +103,7 @@ class PrefsDialog(wx.Dialog):
                 label_ctrl = wx.StaticText(self, -1, label)
                 text_ctrl = wx.TextCtrl(self, -1, "")
                 text_ctrl.SetMinSize((200, 27))
-                text_ctrl.SetValue(config.config[name])
+                text_ctrl.SetValue(str(config.config[name]))
 
                 self.controls_map[name] = text_ctrl
 
