@@ -1,5 +1,5 @@
-include setup.py README.md
-include bin/*
-recursive-include setup/* *
-recursive-include MDB/* *
-include tests/*
+include ez_setup.py setup.py README.md
+include bin/MDB
+recursive-include setup *.py *.sh *.iss
+recursive-include MDB *.py *.png
+include tests *.py
