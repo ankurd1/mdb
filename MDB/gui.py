@@ -311,6 +311,12 @@ def check_and_setup():
     try: os.mkdir(os.path.join(config.mdb_dir, config.images_folder))
     except OSError, e: pass
 
+    db_file = os.path.join(config.mdb_dir, config.db_name)
+    if (os.path.exists(db_file) and \
+            config.config['db_version'] < config.db_version):
+        # db_version is old, make new db file
+        os.unlink(os.path.join(config.mdb_dir, config.db_name))
+
     if (not os.path.exists(os.path.join(config.mdb_dir, config.db_name))):
         create_db = True
     else:
@@ -322,6 +328,10 @@ def check_and_setup():
 
     if (create_db):
         create_database(conn, cur)
+
+        config.config['db_version'] = config.db_version
+        config.config.write()
+        config.post_process()
 
     return conn, cur
 

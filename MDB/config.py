@@ -47,6 +47,7 @@ def type_conv():
 
 #Non configurable stuff
 version = '0.1'
+db_version = '0.2'
 
 out_dir = '.mdb'
 mdb_dir = os.path.join(os.path.expanduser('~'), out_dir)
@@ -100,6 +101,7 @@ defaults = {
         'debug': 'False',
         'update_last_checked': '0',
         'upd_freq': '7',  # days
+        'db_version': '0.1',
 }
 
 prefs_item_map = [
@@ -109,7 +111,8 @@ prefs_item_map = [
 ]
 
 config = ConfigObj(defaults)
-config.merge(ConfigObj(config_file_path))
+config_user = ConfigObj(config_file_path)
+config.merge(config_user)
 config.filename = config_file_path
 
 # FIXME dont do this here
