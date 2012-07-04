@@ -16,8 +16,8 @@ For more details and downloads, visit the `website <http://legaloslotr.github.co
 Acknowlegements
 ---------------
 
-All the data about movies is downloaded from `IMDB <http://imdb.com>`_, using an
-awesome API at `imdbapi.com <http://imdbapi.com>`_.
+All the data about movies is downloaded from `IMDB <http://imdb.com>`_, using
+the awesome API at `imdbapi.com <http://imdbapi.com>`_.
 
 The GUI is developed using `wxPython <http://wxpython.org>`_.
 
