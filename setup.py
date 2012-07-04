@@ -33,6 +33,10 @@ def is_yes(quest):
     else:
         return False
 
+requires = [
+    'requests',
+    'configobj',
+]
 
 setup_options = {
         'name': 'MDB',
@@ -43,8 +47,27 @@ setup_options = {
         'packages': ['MDB'],
         'url': 'http://legaloslotr.github.com/mdb',
         'package_data': {'MDB': ['resources/images/*']},
-        'install_requires': ['configobj', 'requests']
-        }
+        'install_requires': requires,
+        'license': 'MIT',
+        'long_description': open('README.rst').read() + '\n\n' +\
+                open('CHANGELOG.rst').read(),
+        'platforms': ['Unix', 'Windows'],
+        'classifiers': (
+            'Development Status :: 4 - Beta',
+            'Environment :: Win32 (MS Windows)',
+            'Environment :: X11 Applications :: GTK',
+            'Intended Audience :: End Users/Desktop',
+            'License :: OSI Approved :: MIT License',
+            'Natural Language :: English',
+            'Operating System :: Microsoft :: Windows',
+            'Operating System :: Unix',
+            'Programming Language :: Python :: 2',
+            'Topic :: Utilities',
+            'Topic :: Multimedia',
+            'Topic :: Internet',
+            'Topic :: Games/Entertainment',
+            ),
+}
 
 win_options = {
         'windows': [{'script':'bin/MDB'}],
