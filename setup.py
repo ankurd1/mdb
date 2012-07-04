@@ -27,6 +27,7 @@ def get_platform():
 
 def is_yes(quest):
     print quest
+    sys.stdout.flush()
     ans = sys.stdin.readline()
     if (ans.lower().startswith('y')):
         return True
@@ -45,7 +46,7 @@ setup_options = {
         'author': 'Ankur Dahiya',
         'author_email': 'legalos.lotr@gmail.com',
         'packages': ['MDB'],
-        'url': 'http://legaloslotr.github.com/mdb',
+        #'url': 'http://legaloslotr.github.com/mdb',
         'package_data': {'MDB': ['resources/images/*']},
         'install_requires': requires,
         'license': 'MIT',
