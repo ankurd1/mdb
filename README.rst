@@ -13,8 +13,8 @@ MDB runs on Windows and Linux.
 
 For more details and downloads, visit the `website <http://legaloslotr.github.com/mdb>`_.
 
-Thanks
-------
+Acknowlegements
+---------------
 
 All the data about movies is downloaded from `IMDB <http://imdb.com>`_, using an
 awesome API at `imdbapi.com <http://imdbapi.com>`_.
