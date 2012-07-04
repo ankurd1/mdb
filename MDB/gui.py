@@ -311,11 +311,16 @@ def check_and_setup():
     try: os.mkdir(os.path.join(config.mdb_dir, config.images_folder))
     except OSError, e: pass
 
+    if (not os.path.exists(os.path.join(config.mdb_dir, config.db_name))):
+        create_db = True
+    else:
+        create_db = False
+
     conn = sqlite3.connect(os.path.join(config.mdb_dir, config.db_name))
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-    if (not os.path.exists(os.path.join(config.mdb_dir, config.db_name))):
+    if (create_db):
         create_database(conn, cur)
 
     return conn, cur

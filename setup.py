@@ -11,11 +11,9 @@ import shutil
 from subprocess import call
 
 
-# FIXME version is also defined in config.py
+# FIXME the below stuff is also defined in config.py
 VERSION = '0.1'
 
-
-# FIXME this code is also in config.py!
 def get_platform():
     if sys.platform.startswith('win'):
         return 'windows'
@@ -23,7 +21,7 @@ def get_platform():
         return 'linux'
     else:
         return None
-
+####################################################
 
 def is_yes(quest):
     print quest
@@ -148,4 +146,6 @@ if __name__ == '__main__':
                 os.chmod(lin_nautilus_script_out, 0777)
                 print "Shortcuts installed successfully."
     else:
-        print "Platform/action not supported."
+        print "Unknown platform. Still trying to run setup..."
+        setup_options.update(lin_options)
+        setup(**setup_options)
