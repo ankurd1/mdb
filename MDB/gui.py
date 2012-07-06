@@ -13,6 +13,7 @@ from html_window import ClickableHtmlWindow
 from dialogs import HtmlDialog, PrefsDialog
 import config
 from update import UpdateThread
+from multiprocessing.pool import ThreadPool
 
 
 #CLASSES#
@@ -43,9 +44,11 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         self.Layout()
 
     def on_close(self, evt):
-        if (self.db_thread is not None):
-            self.db_thread.exit_now = True
-            self.db_thread.join()
+        # FIXME
+        #self.Destroy()
+        #if (self.db_thread is not None):
+            #self.db_thread.exit_now.set()
+            #frame.db_thread.gui_ready.set()
         if (self.upd_thread is not None):
             self.upd_thread.exit_now = True
             self.upd_thread.join()
@@ -254,6 +257,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
     def on_file_done(self, evt):
         print "event recieved containing", evt.filename
         self.add_row(evt.filename)
+        self.db_thread.gui_ready.set()
 
     def on_show_msg(self, evt):
         if (evt.html):
@@ -275,10 +279,12 @@ def is_movie_file(filename):
 
 def start_dbbuilder(frame, files_wo_data):
     if (frame.db_thread is not None):
-        frame.db_thread.exit_now = True
+        frame.db_thread.exit_now.set()
+        frame.db_thread.gui_ready.set()
         frame.db_thread.join()
 
-    frame.db_thread = DBbuilderThread(frame, files_wo_data)
+    threadpool = ThreadPool(config.imdb_thread_pool_size)
+    frame.db_thread = DBbuilderThread(frame, files_wo_data, threadpool)
     frame.db_thread.start()
 
 

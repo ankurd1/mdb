@@ -10,6 +10,8 @@ import re
 import threading
 import config
 import requests
+import Queue
+import time
 
 
 #HELPER FUNCTIONS#
@@ -94,34 +96,62 @@ def get_movie_name(filename):
     filename = re.sub('\s+', ' ', re.sub(
         '[\._\-\(\)\[\]\{\}]', ' ', filename).strip())
 
-    print old_filename, filename
     return filename
 
 
-def get_imdb_data(moviename):
+def get_imdb_data(filename, queue):
+    moviename = get_movie_name(filename)
     if (moviename == ' ' or moviename == ''):
-        return None, True
+        queue.put((None, filename, False))
+        print "thread done", filename
+        return
 
-    params = {
-            config.api_movie_param: moviename,
-            }
+    params = {config.api_movie_param: moviename}
     params.update(config.api_extra_opts)
 
     try:
         response = requests.get(config.api_url, params=params)
     except requests.RequestException, e:
-        print "DBbuilder: RequestException", e
-        return None, False
+        queue.put((None, filename, True))
+        print "thread done", filename
+        return
 
     if (not response.ok):
         # Should we stop further processing here?
         print "Some error with the api!"
-        return None, True
+        queue.put((None, filename, False))
+        print "thread done", filename
+        return
 
     if (response.json['Response'] == 'True'):
-        return response.json, True
+        for item in response.json:
+            if response.json[item] == 'N/A':
+                response.json[item] = None
+
+        process_img(response.json['Poster'], filename)
+        queue.put((response.json, filename, False))
+        #print "thread done", filename
+        return
     else:
-        return None, True
+        print "none data for", filename
+        queue.put((None, filename, False))
+        print "thread done", filename
+        return
+
+
+def process_img(poster, filename):
+    if (poster is None):
+        return
+    img_url = poster[:-7] + config.img_size + '.jpg'
+    img_file = os.path.join(config.mdb_dir, config.images_folder,
+                            filename + '.jpg')
+    img_fh = open(img_file, 'wb')
+    try:
+        img_fh.write(requests.get(img_url).content)
+    except requests.RequestException, e:
+        # do nothing?
+        pass
+    img_fh.close()
 
 
 def is_in_db(conn, cur, filename):
@@ -136,69 +166,65 @@ def is_in_db(conn, cur, filename):
             return False
 
 
-#CLASSES#
+def signal_gui(parent, filename):
+    evt = wx_signal.FileDoneEvent(wx_signal.myEVT_FILE_DONE, -1, filename)
+    wx.PostEvent(parent, evt)
+
+
+def process_files(files, gui_ready, parent, threadpool, exit_now):
+    conn = sqlite3.connect(os.path.join(config.mdb_dir, config.db_name))
+    cur = conn.cursor()
+
+    file_data_queue = Queue.Queue()
+    threadpool.map_async(lambda fil, queue=file_data_queue:
+            get_imdb_data(fil, queue), files)
+
+    for t in threading.enumerate():
+        print t.name, t.daemon
+
+    for i in range(len(files)):
+        if (gui_ready.wait()):
+            gui_ready.clear()
+            if (exit_now.is_set()):
+                print "dbbuilder recd exit_now, exiting"
+                return
+
+            imdb_data, filename, conn_err = file_data_queue.get()
+            print "dbbuilder recd", filename
+
+            if (conn_err):
+                evt = wx_signal.ShowMsgEvent(wx_signal.myEVT_SHOW_MSG, -1,
+                        config.cant_connect_content)
+                wx.PostEvent(parent, evt)
+                return
+
+            if (imdb_data is not None):
+                add_to_db(filename, imdb_data, conn, cur)
+                signal_gui(parent, filename)
+                print "processed", filename
+            else:
+                gui_ready.set()
+
+
 class DBbuilderThread(threading.Thread):
-    def __init__(self, parent, files):
+    def __init__(self, parent, files, threadpool):
         threading.Thread.__init__(self)
         self.parent = parent
         self.files = files
-        self.exit_now = False
+        self.gui_ready = threading.Event()
+        self.gui_ready.set()
+        self.exit_now = threading.Event()
+        self.exit_now.clear()
+        self.threadpool = threadpool
 
     def run(self):
         """Overrides Thread.run. Don't call this directly its called internally
         when you call Thread.start().
         """
         print 'dbbuilder running'
-        self.process_files()
+        start = time.time()
+        process_files(self.files, self.gui_ready, self.parent, self.threadpool,
+                self.exit_now)
         print 'dbbuilder exiting'
-
-    def signal_gui(self, filename):
-        evt = wx_signal.FileDoneEvent(wx_signal.myEVT_FILE_DONE, -1, filename)
-        wx.PostEvent(self.parent, evt)
-
-    def process_file(self, filename, conn, cur):
-        file_data, process_further = get_imdb_data(get_movie_name(filename))
-        if (not process_further):
-            return False
-
-        if (file_data is None):
-            print "None data from imdb for", filename
-            return True
-
-        for item in file_data:
-            if file_data[item] == 'N/A':
-                file_data[item] = None
-
-        if (file_data is not None):
-            # Add to db, save img, send signal
-            add_to_db(filename, file_data, conn, cur)
-            if file_data['Poster'] is not None:
-                # save image
-                img_url = file_data['Poster'][:-7] + config.img_size + '.jpg'
-                img_file = os.path.join(config.mdb_dir, config.images_folder,
-                                        filename + '.jpg')
-                img_fh = open(img_file, 'wb')
-                try: img_fh.write(requests.get(img_url).content)
-                except requests.RequestException, e: pass
-                img_fh.close()
-            self.signal_gui(filename)
-            print 'file processed'
-        return True
-
-    def process_files(self):
-        conn = sqlite3.connect(os.path.join(config.mdb_dir, config.db_name))
-        cur = conn.cursor()
-
-        try:
-            for filename in self.files:
-                if (self.exit_now):
-                    return
-                process_further = self.process_file(filename, conn, cur)
-                if (not process_further):
-                    evt = wx_signal.ShowMsgEvent(wx_signal.myEVT_SHOW_MSG, -1,
-                            config.cant_connect_content)
-                    wx.PostEvent(self.parent, evt)
-                    return
-        except Exception, e:
-            zenity_error(str(e))
-            raise
+        print '{0} files processed in {1}s'.format(len(self.files),
+                time.time() - start)

@@ -65,6 +65,8 @@ img_size = '100'
 
 imdb_icon = os.path.join(module_path(), 'resources/images/imdb-logo.png')
 
+imdb_thread_pool_size = 10
+
 platform = get_platform()
 
 update_url = 'http://legaloslotr.github.com/mdb/update.html'
