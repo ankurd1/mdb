@@ -11,7 +11,6 @@ class UpdateThread(threading.Thread):
         threading.Thread.__init__(self)
         self.parent = parent
         self.force = force
-        self.exit_now = False
 
     def run(self):
         """Overrides Thread.run. Don't call this directly its called internally
