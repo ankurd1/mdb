@@ -147,19 +147,20 @@ a.button:hover {
 }
 
 a.button span {
-  padding-left: 50px;
+  text-align: center;
   display: block;
   height: 23px;
+  padding: 2px;
 }
 
-#download-zip span {
-  background: transparent url(../images/zip-icon.png) 12px 50% no-repeat;
+#download-windows span {
+  background: transparent url(../images/windows-logo.png) 12px 50% no-repeat;
 }
-#download-tar-gz span {
-  background: transparent url(../images/tar-gz-icon.png) 12px 50% no-repeat;
+#download-linux span {
+  background: transparent url(../images/linux-logo.png) 12px 50% no-repeat;
 }
 #view-on-github span {
-  background: transparent url(../images/octocat-icon.png) 12px 50% no-repeat;
+  background: transparent url(../images/octocat-icon.png) 8px 50% no-repeat;
 }
 #view-on-github {
   margin-right: 0;

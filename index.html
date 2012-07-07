@@ -61,30 +61,40 @@
         <hr>
 
 		<section id="main_content">
-		<p class='center'><a href='images/screenshot.png'>
-			<img src='images/screenshot-small.png' title='Click for full size'></a></p>
+		<p class='center'><a href='images/screenshot-new.png'>
+			<img src='images/screenshot-new-small.png' title='Click for full size'></a></p>
 		<p>Run MDB on a folder or a set of files/folders and it downloads imdb 
 		data for all movie files found and shows it in a nice GUI.</p>
 
-		<p>You can then sort the movies by title, rating, runtime, releaseYear or Genre.
-		All this data is cached on your computer, so we don't need to hit imdb
-		the next time!</p>
+		<p>You can then sort the movies by title, rating, runtime, releaseYear or Genre.</p>
 
-		<p>MDB runs on Windows and Linux.</p>
+		<ul>
+			<li>Runs on Windows and Linux</li>
+			<li>Uses threads and caching. Is super fast!</li>
+			<li>Works through http proxies</li>
+			<li>Automatically checks for updates</li>
+			<li>Automagically resolves file names like
+			"Eva.2011.R5.XviD.VaLeBo.mkv"</li>
+			<li>No reason why you shouldn't be using it everyday! :)</li>
+		</ul>
 
 		<h2>Installation</h2>
 
 		<h3>Linux</h3>
 
-		<p>Download the zip from <a href="#">here</a>
-		and extract it somewhere.
-		MDB depends on wxPython, so before you run it, install wx:</p>
+		MDB depends on wxPython, so before you run it, install wx:
 
 		<pre>
 		<code>sudo apt-get install python-wxgtk2.8</code>
 		</pre>
 
-		To install MDB, navigate to the MDB folder and run:
+		To install MDB, you can use pip:
+		<pre>
+		<code>sudo pip install MDB</code>
+		</pre>
+
+		Or else (if you don't wan't to use pip), download the tarball from
+		<a href="#">here</a>, extract it and run:
 		<pre>
 		<code>sudo python setup.py install</code>
 		</pre>
@@ -98,23 +108,20 @@
 		<h2>Usage</h2>
 
 		<ul>
-			<li>Right-click anywhere in a movie folder and select MDB! (On linux, you would
-			have to select scripts-&gt;MDB in the right-click menu).</li>
-			<li>You can also right-click a file/folder and select MDB. On linux, you can even
-			select multiple files/folders before right-clicking.</li>
-			<li>Or you could just run gui.py OR gui.exe to launch the program. You can also
-			provide arguments to the program, otherwise the current working dir would be
-			scanned for movie files.</li>
-			<li>Once the program is running, you can sort by clicking on a column name OR you
-			can switch to another folder by selecting File-&gt;Open (Ctrl+O).</li>
+			<li>Right-click anywhere in a movie folder and select MDB!<br>
+			(On linux, you would have to select scripts-&gt;MDB in the right-click menu).</li>
+			<li>You can also right-click a file/folder</li>
+			<li>MDB also works through a HTTP proxy. Just navigate to
+			File->preferences and enter your proxy settings as
+			http://proxyhost:proxyport/</li>
 		</ul>
 		
 		<h2>Coming soon</h2>
 
 		<ul>
-			<li>Ability to download subtitles.</li>
-			<li>Proxy support.</li>
+			<li>Support for downloading subtitles</li>
 			<li>Ability to search for title/director/actor/genre.</li>
+			<li>And much more...</li>
 		</ul>
 		</section>
 
