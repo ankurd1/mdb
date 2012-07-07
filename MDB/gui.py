@@ -46,9 +46,10 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
     def on_close(self, evt):
         # FIXME
         #self.Destroy()
-        #if (self.db_thread is not None):
-            #self.db_thread.exit_now.set()
-            #frame.db_thread.gui_ready.set()
+        if (self.db_thread is not None):
+            self.db_thread.exit_now.set()
+            self.db_thread.gui_ready.set()
+            self.db_thread.join()
         if (self.upd_thread is not None):
             self.upd_thread.exit_now = True
             self.upd_thread.join()

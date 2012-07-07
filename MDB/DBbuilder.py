@@ -99,7 +99,11 @@ def get_movie_name(filename):
     return filename
 
 
-def get_imdb_data(filename, queue):
+def get_imdb_data(filename, queue, exit_now):
+    if (exit_now.is_set()):
+        print "thread saw exit_now", filename
+        queue.put((None, filename, True))
+        return
     moviename = get_movie_name(filename)
     if (moviename == ' ' or moviename == ''):
         queue.put((None, filename, False))
@@ -128,6 +132,10 @@ def get_imdb_data(filename, queue):
             if response.json[item] == 'N/A':
                 response.json[item] = None
 
+        if (exit_now.is_set()):
+            print "thread saw exit_now", filename
+            queue.put((None, filename, True))
+            return
         process_img(response.json['Poster'], filename)
         queue.put((response.json, filename, False))
         #print "thread done", filename
@@ -176,8 +184,8 @@ def process_files(files, gui_ready, parent, threadpool, exit_now):
     cur = conn.cursor()
 
     file_data_queue = Queue.Queue()
-    threadpool.map_async(lambda fil, queue=file_data_queue:
-            get_imdb_data(fil, queue), files)
+    threadpool.map_async(lambda fil, queue=file_data_queue, exit_now=exit_now:
+            get_imdb_data(fil, queue, exit_now), files)
 
     for t in threading.enumerate():
         print t.name, t.daemon
@@ -185,25 +193,26 @@ def process_files(files, gui_ready, parent, threadpool, exit_now):
     for i in range(len(files)):
         if (gui_ready.wait()):
             gui_ready.clear()
-            if (exit_now.is_set()):
-                print "dbbuilder recd exit_now, exiting"
-                return
 
             imdb_data, filename, conn_err = file_data_queue.get()
             print "dbbuilder recd", filename
 
-            if (conn_err):
+            if (conn_err and not exit_now.is_set()):
                 evt = wx_signal.ShowMsgEvent(wx_signal.myEVT_SHOW_MSG, -1,
                         config.cant_connect_content)
                 wx.PostEvent(parent, evt)
                 return
 
-            if (imdb_data is not None):
+            if (imdb_data is not None and not exit_now.is_set()):
                 add_to_db(filename, imdb_data, conn, cur)
                 signal_gui(parent, filename)
                 print "processed", filename
             else:
                 gui_ready.set()
+
+    print "leaving process_files"
+    #print "joining threadpool"
+    #threadpool.join()
 
 
 class DBbuilderThread(threading.Thread):
