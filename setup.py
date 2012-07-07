@@ -32,6 +32,24 @@ def is_yes(quest):
     else:
         return False
 
+def linux_install_data_files(data_files):
+    for item in data_files:
+        print "{0}->{1}".format(item[1], item[0])
+        try:
+            shutil.copy(item[1], os.path.join(sys.prefix, item[0]))
+        except Exception, e:
+            print e
+
+    try:
+        call(['update-desktop-database'])
+    except:
+        print "update-desktop-database: failed"
+    try:
+        call(['gtk-update-icon-cache', os.path.join(sys.prefix, 'share/icons/hicolor')])
+    except:
+        print "update-desktop-database: failed"
+
+
 requires = [
     'requests',
     'configobj',
@@ -73,6 +91,11 @@ win_options = {
         'windows': [{'script':'bin/MDB'}],
         'options': {'py2exe': {'bundle_files': 2}},
         }
+
+lin_data_files = [('share/applications', 'setup/linux/MDB.desktop')]
+for x in ['16', '24', '32', '48', '64', '96', '128', '192', '256']:
+    lin_data_files.append(('share/icons/hicolor/{0}x{0}/apps/MDB.png'.format(x),
+        'setup/icons/MDB_{0}.png'.format(x)))
 
 lin_options = {
         'scripts': ['bin/MDB'],
@@ -138,6 +161,9 @@ if __name__ == '__main__':
         setup(**setup_options)
 
         if (action == 'install'):
+            print 'Installing icons and desktop files...'
+            linux_install_data_files(lin_data_files)
+
             if (is_yes("Do you want to install right-click shortcuts for " +\
                     "nautilus/gnome? (y/n)")):
                 # copy nautilus-shortcuts.py to nautilus scripts
