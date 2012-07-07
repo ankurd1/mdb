@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=0.1
+Exec=MDB %U
+Icon=MDB
+Terminal=false
+Type=Application
+Categories=Utility;AudioVideo;Video;GTK;
+Name=MDB
+Comment=View IMDB data for your movie collection
