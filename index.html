@@ -26,6 +26,19 @@
 	})();
 
 	</script>
+	<!-- FB Open Graph tags -->
+	<meta property="og:title" content="MDB (MovieDirBrowser)"/>
+	<meta property="og:type" content="product"/>
+	<meta property="og:url" content="http://legaloslotr.github.com/mdb/"/>
+	<meta property="og:image"
+	content="http://legaloslotr.github.com/mdb/images/screenshot-new.png"/>
+	<meta property="og:site_name" content="MDB"/>
+	<meta property="fb:admins" content="ankur.dahiya1"/>
+	<meta property="og:description"
+		content="A cool way to visualize your movie collection and decide which
+		movie to watch next! Run MDB on a folder or a set of files/folders and
+		it downloads imdb data for all movie files found and shows it in a nice
+		GUI."/>
 
   </head>
 
@@ -48,8 +61,6 @@
 			  or a set of files/folders and it downloads imdb data for all movie
 			  files found and shows it in a nice GUI.</h2>
 			
-		  <div class="fb-like" data-href="http://legaloslotr.github.com/mdb"
-			  data-send="true" data-width="620" data-show-faces="true"></div>
         </header>
 
         <section id="downloads" class="clearfix">
@@ -68,6 +79,8 @@
 		</a>
 		<p class='center stress'>Current Version: 0.1<br>Development Status: Beta</p>
         </section>
+		  <div class="fb-like" data-href="http://legaloslotr.github.com/mdb"
+			  data-send="true" data-width="620" data-show-faces="true"></div>
 
         <hr>
 
@@ -93,21 +106,16 @@
 
 		<h3>Linux</h3>
 
-		MDB depends on wxPython, so before you run it, install wx:
-
+		MDB depends on wxPython; so before you run it, install wx.<br>
+		Debian/Ubuntu based users can simply do this:
 		<pre>
-		<code>sudo apt-get install python-wxgtk2.8</code>
-		</pre>
-
-		To install MDB, you can use pip:
-		<pre>
-		<code>sudo pip install MDB</code>
+<code>sudo apt-get install python-wxgtk2.8 && sudo apt-get install python-pip && sudo pip install MDB</code>
 		</pre>
 
 		Or else (if you don't wan't to use pip), download the tarball from
 		<a href="#">here</a>, extract it and run:
 		<pre>
-		<code>sudo python setup.py install</code>
+<code>sudo python setup.py install</code>
 		</pre>
 
 		<h3>Windows</h3>
