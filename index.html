@@ -31,6 +31,14 @@
 
   <body>
     <div id="container">
+	<div id="fb-root"></div>
+	<script>(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=130074447133997";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));</script>
       <div class="inner">
 
         <header>
@@ -39,6 +47,9 @@
 			  collection and decide which movie to watch next! Run MDB on a folder
 			  or a set of files/folders and it downloads imdb data for all movie
 			  files found and shows it in a nice GUI.</h2>
+			
+		  <div class="fb-like" data-href="http://legaloslotr.github.com/mdb"
+			  data-send="true" data-width="620" data-show-faces="true"></div>
         </header>
 
         <section id="downloads" class="clearfix">
