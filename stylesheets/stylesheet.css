@@ -378,3 +378,8 @@ footer a:hover {
 .stress {
 	color: red;
 }
+
+#mdb-logo {
+	margin: 10px;
+	float: left;
+}
