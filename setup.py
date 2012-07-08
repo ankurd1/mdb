@@ -34,9 +34,14 @@ def is_yes(quest):
 
 def linux_install_data_files(data_files):
     for item in data_files:
-        print "{0}->{1}".format(item[1], item[0])
+        path = os.path.join(sys.prefix, item[0])
+        print "{0}->{1}".format(item[1], path)
         try:
-            shutil.copy(item[1], os.path.join(sys.prefix, item[0]))
+            os.makedirs(os.path.split(path)[0])
+        except OSError, e:
+            pass
+        try:
+            shutil.copy(item[1], path)
         except Exception, e:
             print e
 
@@ -88,7 +93,9 @@ setup_options = {
 }
 
 win_options = {
-        'windows': [{'script':'bin/MDB'}],
+        'windows': [{'script':'bin/MDB',
+            'icon_resources': [(0, 'setup\\icons\\MDB_all.ico')],
+            }],
         'options': {'py2exe': {'bundle_files': 2}},
         }
 
@@ -141,6 +148,10 @@ if __name__ == '__main__':
             if (is_yes("Do you want to build the installer? (y/n)")):
                 iss_file = 'setup/windows/MDB.iss'
                 call(['Compil32.exe', '/cc', iss_file])
+        elif (action == 'installer'):
+            print "Building installer"
+            iss_file = 'setup/windows/MDB.iss'
+            call(['Compil32.exe', '/cc', iss_file])
         else:
             setup_options.update(win_options)
             setup(**setup_options)
@@ -161,8 +172,10 @@ if __name__ == '__main__':
         setup(**setup_options)
 
         if (action == 'install'):
-            print 'Installing icons and desktop files...'
-            linux_install_data_files(lin_data_files)
+            if (is_yes("Do you want to install icons and menu entries? (y/n)")):
+                print 'Installing icons and desktop files...'
+                # FIXME this is hacky
+                linux_install_data_files(lin_data_files)
 
             if (is_yes("Do you want to install right-click shortcuts for " +\
                     "nautilus/gnome? (y/n)")):

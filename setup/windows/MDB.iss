@@ -22,6 +22,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
+SetupIconFile=..\icons\MDB_all.ico
 OutputBaseFilename=setup
 Compression=lzma
 SolidCompression=yes
