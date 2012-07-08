@@ -65,6 +65,7 @@ img_size = '100'
 
 imdb_icon = os.path.join(module_path(), 'resources', 'images', 'imdb-logo.png')
 mdb_icon = os.path.join(module_path(), 'resources', 'images', 'MDB_all.ico')
+mdb_icon_64 = os.path.join(module_path(), 'resources', 'images', 'MDB_64.png')
 
 imdb_thread_pool_size = 10
 
@@ -77,14 +78,16 @@ abt_dlg_content = {
     'body': '''
         <body bgcolor="#f1f1f1">
         <center>
-        <h2>MDB - MovieDirBrowser</h2>
+        <table><tr><td><img src="{1}"></td>
+        <td><h2>MDB<br>MovieDirBrowser</h2></td>
+        </tr></table>
         v{0}<br>
         <a href="http://legaloslotr.github.com/mdb">
         http://legaloslotr.github.com/mdb</a><br>
         <a href="mailto:legalos.lotr@gmail.com">Ankur Dahiya</a><br>
         Data collected from <a href="http://imdb.com">IMDB</a>
         </center></body>
-        '''.format(version),
+        '''.format(version, mdb_icon_64),
 }
 
 cant_connect_content = {
