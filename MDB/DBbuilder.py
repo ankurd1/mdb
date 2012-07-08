@@ -130,10 +130,6 @@ def get_imdb_data(filename, queue, exit_now):
         return
 
     if (response.json['Response'] == 'True'):
-        for item in response.json:
-            if response.json[item] == 'N/A':
-                response.json[item] = None
-
         if (exit_now.is_set()):
             print "thread saw exit_now", filename
             queue.put((None, filename, True))
@@ -150,7 +146,7 @@ def get_imdb_data(filename, queue, exit_now):
 
 
 def process_img(poster, filename):
-    if (poster is None):
+    if (poster is None or poster == 'N/A'):
         return
     img_url = poster[:-7] + config.img_size + '.jpg'
     img_file = os.path.join(config.mdb_dir, config.images_folder,
