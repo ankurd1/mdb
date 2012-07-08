@@ -45,14 +45,16 @@ def create_database(conn, cur):
 
 
 def add_to_db(filename, file_data, conn, cur):
+    args = [filename.decode('utf-8'), file_data['Title'], file_data['Year'],
+        file_data['Released'], file_data['Genre'], file_data['imdbRating'],
+        file_data['Runtime'], file_data['Director'], file_data['Actors'],
+        file_data['Plot'], file_data['Poster'], file_data['imdbID']]
+
     if (is_in_db(conn, cur, filename)):
         return
 
-    cur.execute('INSERT INTO movies VALUES(?,?,?,?,?,?,?,?,?,?,?,?)', (
-        filename, file_data['Title'], file_data['Year'],
-        file_data['Released'], file_data['Genre'], file_data['imdbRating'],
-        file_data['Runtime'], file_data['Director'], file_data['Actors'],
-        file_data['Plot'], file_data['Poster'], file_data['imdbID']))
+    cur.execute('INSERT INTO movies VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
+            tuple(args))
     conn.commit()
 
 
@@ -167,11 +169,17 @@ def is_in_db(conn, cur, filename):
         return False
     else:
         res = cur.execute('SELECT * FROM movies WHERE filename=?',
-                          (filename,)).fetchall()
+                          (filename.decode('utf-8'),)).fetchall()
         if len(res) > 0:
             return True
         else:
             return False
+
+
+def get_from_db(conn, cur, filename):
+    res = cur.execute('SELECT * FROM movies WHERE filename=?',
+            (filename.decode('utf-8'),)).fetchall()
+    return res[0]
 
 
 def signal_gui(parent, filename):

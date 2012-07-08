@@ -5,7 +5,7 @@ import wx
 import wx.lib.agw.ultimatelistctrl as ULC
 from wx.lib.mixins.listctrl import ColumnSorterMixin
 import sqlite3
-from DBbuilder import create_database, is_in_db, DBbuilderThread
+from DBbuilder import create_database, is_in_db, DBbuilderThread, get_from_db
 import os
 import wx_signal
 import wx.html
@@ -179,7 +179,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
     def add_row(self, filename):
         # get info from db, build info panel, add to list, update
         # itemdatamap
-        data = self.get_from_db(filename)
+        data = get_from_db(self.conn, self.cur, filename)
 
         index = self.lst.InsertStringItem(sys.maxint, data['title'])
 
@@ -189,8 +189,8 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
         self.lst.SetStringItem(index, 1, unicode(data["rating"]))
         self.lst.SetStringItem(index, 2, unicode(data["year"]))
-        self.lst.SetStringItem(index, 3, unicode(data["genre"]))
-        self.lst.SetStringItem(index, 4, unicode(data["runtime"]))
+        self.lst.SetStringItem(index, 3, data["genre"])
+        self.lst.SetStringItem(index, 4, data["runtime"])
         self.lst.SetItemWindow(index, 5, self.build_info_panel(data),
                 expand=True)
         self.total_rows += 1
@@ -202,33 +202,28 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         else:
             self.sb.SetStatusText("{0} Files".format(self.total_rows), 1)
 
-    def get_from_db(self, filename):
-        res = self.cur.execute('SELECT * FROM movies WHERE filename=?',
-                (filename,)).fetchall()
-        return res[0]
-
     def build_info_panel(self, data):
         html_win = ClickableHtmlWindow(self.lst, size=(-1, 180))
         html_win.attach_to_frame(self, 0)
                 #style=wx.html.HW_SCROLLBAR_NEVER)
 
-        html_text = "<table><tr>"
+        html_text = u"<table><tr>"
         img_file = os.path.join(config.mdb_dir, config.images_folder,
                 data['filename'] + '.jpg')
         if os.path.exists(img_file):
-            html_text += '<td width="100" rowspan="2">\
+            html_text += u'<td width="100" rowspan="2">\
                     <img src="{0}"></td>\n'.format(img_file)
         else:
-            html_text += '<td width="100" rowspan="2"></td>'
+            html_text += u'<td width="100" rowspan="2"></td>'
 
         # imdb icon
-        html_text += '<td><a href="http://imdb.com/title/{0}">\
+        html_text += u'<td><a href="http://imdb.com/title/{0}">\
                 <img src="{1}"></a></td></tr>'.format(data['imdbID'],
                         config.imdb_icon)
 
         # details
-        html_text += "<tr><td>" + self.generate_label_text(data) + "</td></tr>"
-        html_text += "</table>"
+        html_text += u"<tr><td>" + self.generate_label_text(data) + u"</td></tr>"
+        html_text += u"</table>"
 
         html_win.SetPage(html_text)
 
