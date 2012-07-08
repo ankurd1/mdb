@@ -20,6 +20,7 @@ from multiprocessing.pool import ThreadPool
 class MyFrame(wx.Frame, ColumnSorterMixin):
     def __init__(self, parent, conn, cur):
         wx.Frame.__init__(self, parent, -1, "MDB")
+        self.set_icon()
         self.conn = conn
         self.cur = cur
         self.db_thread = None
@@ -43,6 +44,12 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         self.sizer.Add(self.lst, 1, wx.EXPAND)
         self.Layout()
 
+    def set_icon(self):
+        ib = wx.IconBundle()
+        print "setting icon", config.mdb_icon
+        print ib.AddIconFromFile(config.mdb_icon, wx.BITMAP_TYPE_ICO)
+        print self.SetIcons(ib)
+ 
     def on_close(self, evt):
         if (self.db_thread is not None):
             self.db_thread.exit_now.set()

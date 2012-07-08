@@ -63,7 +63,8 @@ movie_formats = ['avi', 'mkv', 'mp4', 'm4v', 'rmvb']
 
 img_size = '100'
 
-imdb_icon = os.path.join(module_path(), 'resources/images/imdb-logo.png')
+imdb_icon = os.path.join(module_path(), 'resources', 'images', 'imdb-logo.png')
+mdb_icon = os.path.join(module_path(), 'resources', 'images', 'MDB_all.ico')
 
 imdb_thread_pool_size = 10
 

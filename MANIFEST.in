@@ -2,5 +2,5 @@ include ez_setup.py setup.py README.rst LICENSE.txt CHANGELOG.rst
 include bin/MDB
 recursive-include setup *.py *.sh *.iss *.desktop *.png *.ico
 recursive-include MDB *.py
-recursive-include MDB/resources *.png
+recursive-include MDB/resources *.png *.ico
 recursive-include tests *.py
