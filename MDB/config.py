@@ -46,14 +46,13 @@ def type_conv():
 
 
 #Non configurable stuff
-version = '0.1'
-db_version = '0.2'
+version = u'0.1'
+db_version = u'0.2'
 
-out_dir = '.mdb'
-mdb_dir = os.path.join(os.path.expanduser('~'), out_dir)
-db_name = 'mdbdata.sqlite'
-images_folder = 'images'
-config_file_path = os.path.join(mdb_dir, '.config')
+mdb_dir = os.path.join(os.path.expanduser('~'), u'.mdb')
+db_name = u'mdbdata.sqlite'
+images_folder = u'images'
+config_file_path = os.path.join(mdb_dir, u'.config')
 
 api_url = 'http://www.imdbapi.com'
 api_movie_param = 't'
@@ -75,7 +74,7 @@ update_url = 'http://legaloslotr.github.com/mdb/update.html'
 
 abt_dlg_content = {
     'title': 'About',
-    'body': '''
+    'body': u'''
         <body bgcolor="#f1f1f1">
         <center>
         <table><tr><td><img src="{1}"></td>

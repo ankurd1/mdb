@@ -236,11 +236,11 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         return txt
 
     def generate_label_text(self, data):
-        data2 = [('Title', unicode(data['title'])),
-                ('Filename', self.make_wrappable(unicode(data['filename']))),
-                ('Director', unicode(data['director'])),
-                ('Actors', unicode(data['actors'])),
-                ('Plot', unicode(data['plot'])),
+        data2 = [('Title', data['title']),
+                ('Filename', self.make_wrappable(data['filename'])),
+                ('Director', data['director']),
+                ('Actors', data['actors']),
+                ('Plot', data['plot']),
                 ]
 
         res = u"<table cellspacing=0 cellpadding=2>"
@@ -271,7 +271,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
 #HELPER FUNCTIONS#
 def is_movie_file(filename):
-    if (filename[-3:] in config.movie_formats):
+    if (filename.split('.')[-1] in config.movie_formats):
         return True
     else:
         return False
@@ -362,7 +362,7 @@ def main():
 
     if (target_files is None):
         # use cwd as target_files
-        files_with_data, files_wo_data = process_dir('.', conn, cur)
+        files_with_data, files_wo_data = process_dir(u'.', conn, cur)
     else:
         files_with_data = []
         files_wo_data = []
@@ -370,7 +370,7 @@ def main():
         #target_files should be in cwd
         #make all target_files non_absolute
         for i in range(len(target_files)):
-            target_files[i] = os.path.basename(target_files[i])
+            target_files[i] = unicode(os.path.basename(target_files[i]), 'utf-8')
 
         for fil in target_files:
             if os.path.isdir(fil):

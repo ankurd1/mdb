@@ -45,7 +45,7 @@ def create_database(conn, cur):
 
 
 def add_to_db(filename, file_data, conn, cur):
-    args = [filename.decode('utf-8'), file_data['Title'], file_data['Year'],
+    args = [filename, file_data['Title'], file_data['Year'],
         file_data['Released'], file_data['Genre'], file_data['imdbRating'],
         file_data['Runtime'], file_data['Director'], file_data['Actors'],
         file_data['Plot'], file_data['Poster'], file_data['imdbID']]
@@ -165,7 +165,7 @@ def is_in_db(conn, cur, filename):
         return False
     else:
         res = cur.execute('SELECT * FROM movies WHERE filename=?',
-                          (filename.decode('utf-8'),)).fetchall()
+                          (filename,)).fetchall()
         if len(res) > 0:
             return True
         else:
@@ -174,7 +174,7 @@ def is_in_db(conn, cur, filename):
 
 def get_from_db(conn, cur, filename):
     res = cur.execute('SELECT * FROM movies WHERE filename=?',
-            (filename.decode('utf-8'),)).fetchall()
+            (filename,)).fetchall()
     return res[0]
 
 
@@ -190,9 +190,6 @@ def process_files(files, gui_ready, parent, threadpool, exit_now):
     file_data_queue = Queue.Queue()
     threadpool.map_async(lambda fil, queue=file_data_queue, exit_now=exit_now:
             get_imdb_data(fil, queue, exit_now), files)
-
-    for t in threading.enumerate():
-        print t.name, t.daemon
 
     for i in range(len(files)):
         if (gui_ready.wait()):
