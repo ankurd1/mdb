@@ -45,13 +45,17 @@ def type_conv():
     config['update_last_checked'] = int(config['update_last_checked'])
 
 
+def get_resource(*args):
+    return os.path.join(module_path(), 'resources', *args)
+
+
 #Non configurable stuff
 version = u'0.1'
 db_version = u'0.2'
 
 mdb_dir = os.path.join(os.path.expanduser('~'), u'.mdb')
-db_name = u'mdbdata.sqlite'
-images_folder = u'images'
+db_file = os.path.join(mdb_dir, u'mdbdata.sqlite')
+images_folder = os.path.join(mdb_dir, u'images')
 config_file_path = os.path.join(mdb_dir, u'.config')
 
 api_url = 'http://www.imdbapi.com'
@@ -61,10 +65,6 @@ api_extra_opts = {}  # '&plot=full'
 movie_formats = ['avi', 'mkv', 'mp4', 'm4v', 'rmvb']
 
 img_size = '100'
-
-imdb_icon = os.path.join(module_path(), 'resources', 'images', 'imdb-logo.png')
-mdb_icon = os.path.join(module_path(), 'resources', 'images', 'MDB_all.ico')
-mdb_icon_64 = os.path.join(module_path(), 'resources', 'images', 'MDB_64.png')
 
 imdb_thread_pool_size = 10
 
@@ -86,7 +86,7 @@ abt_dlg_content = {
         <a href="mailto:legalos.lotr@gmail.com">Ankur Dahiya</a><br>
         Data collected from <a href="http://imdb.com">IMDB</a>
         </center></body>
-        '''.format(version, mdb_icon_64),
+        '''.format(version, get_resource('images', 'MDB_64.png')),
 }
 
 cant_connect_content = {

@@ -46,9 +46,9 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
 
     def set_icon(self):
         ib = wx.IconBundle()
-        print "setting icon", config.mdb_icon
-        print ib.AddIconFromFile(config.mdb_icon, wx.BITMAP_TYPE_ICO)
-        print self.SetIcons(ib)
+        ib.AddIconFromFile(config.get_resource('images', 'MDB_all.ico'),
+            wx.BITMAP_TYPE_ICO)
+        self.SetIcons(ib)
  
     def on_close(self, evt):
         if (self.db_thread is not None):
@@ -208,8 +208,7 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
                 #style=wx.html.HW_SCROLLBAR_NEVER)
 
         html_text = u"<table><tr>"
-        img_file = os.path.join(config.mdb_dir, config.images_folder,
-                data['filename'] + '.jpg')
+        img_file = os.path.join(config.images_folder, data['filename'] + '.jpg')
         if os.path.exists(img_file):
             html_text += u'<td width="100" rowspan="2">\
                     <img src="{0}"></td>\n'.format(img_file)
@@ -219,7 +218,8 @@ class MyFrame(wx.Frame, ColumnSorterMixin):
         # imdb icon
         html_text += u'<td><a href="http://imdb.com/title/{0}">\
                 <img src="{1}"></a></td></tr>'.format(data['imdbID'],
-                        config.imdb_icon)
+                        config.get_resource('images', 'imdb-logo.png'))
+        print html_text
 
         # details
         html_text += u"<tr><td>" + self.generate_label_text(data) + u"</td></tr>"
@@ -314,21 +314,20 @@ def check_and_setup():
     try: os.mkdir(config.mdb_dir)
     except OSError, e: pass
 
-    try: os.mkdir(os.path.join(config.mdb_dir, config.images_folder))
+    try: os.mkdir(config.images_folder)
     except OSError, e: pass
 
-    db_file = os.path.join(config.mdb_dir, config.db_name)
-    if (os.path.exists(db_file) and \
+    if (os.path.exists(config.db_file) and \
             config.config['db_version'] < config.db_version):
         # db_version is old, make new db file
-        os.unlink(os.path.join(config.mdb_dir, config.db_name))
+        os.unlink(config.db_file)
 
-    if (not os.path.exists(os.path.join(config.mdb_dir, config.db_name))):
+    if (not os.path.exists(config.db_file)):
         create_db = True
     else:
         create_db = False
 
-    conn = sqlite3.connect(os.path.join(config.mdb_dir, config.db_name))
+    conn = sqlite3.connect(config.db_file)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 

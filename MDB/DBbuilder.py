@@ -149,8 +149,7 @@ def process_img(poster, filename):
     if (poster is None or poster == 'N/A'):
         return
     img_url = poster[:-7] + config.img_size + '.jpg'
-    img_file = os.path.join(config.mdb_dir, config.images_folder,
-                            filename + '.jpg')
+    img_file = os.path.join(config.images_folder, filename + '.jpg')
     img_fh = open(img_file, 'wb')
     try:
         img_fh.write(requests.get(img_url).content)
@@ -184,7 +183,7 @@ def signal_gui(parent, filename):
 
 
 def process_files(files, gui_ready, parent, threadpool, exit_now):
-    conn = sqlite3.connect(os.path.join(config.mdb_dir, config.db_name))
+    conn = sqlite3.connect(config.db_file)
     cur = conn.cursor()
 
     file_data_queue = Queue.Queue()
